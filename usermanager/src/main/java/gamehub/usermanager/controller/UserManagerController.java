@@ -21,7 +21,7 @@ import gamehub.usermanager.validation.PasswordValidator;
 @RestController
 public class UserManagerController {
 
-	@InitBinder
+	@InitBinder("UserPasswordChange")
 	public void initBinder(WebDataBinder dataBinder) {
 		dataBinder.addValidators(new PasswordValidator());
 	}
@@ -34,31 +34,37 @@ public class UserManagerController {
 	@PostMapping(path = "/create", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<UserInfoDTO> create(@Valid @RequestBody(required = true) UserCreateDTO user) {
 		// Mock return data
-		return ResponseEntity.ok().body(getMock());
+		return ResponseEntity.ok().body(getMock("create"));
 	}
 	
-	@PostMapping(path = "/update//{username}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(path = "/update/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<UserInfoDTO> update(@Valid @RequestBody(required = true) UserUpdateDTO user) {
 		// Mock return data
-		return ResponseEntity.ok().body(getMock());
+		return ResponseEntity.ok().body(getMock("update"));
 	}
 	
-	@PostMapping(path = "/changePassword//{username}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@PostMapping(path = "/changePassword/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<UserInfoDTO> changePassword(@Valid @RequestBody(required = true) UserPasswordChange password) {
 		// Mock return data
-		return ResponseEntity.ok().body(getMock());
+		return ResponseEntity.ok().body(getMock("changePassword"));
 	}
 	
-	@GetMapping(path = "/info/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<UserInfoDTO> info(@PathVariable(required = true) String username) {
+	@GetMapping(path = "/get/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<UserInfoDTO> getByUsername(@PathVariable(required = true) String username) {
 		// Mock return data
-		return ResponseEntity.ok().body(getMock());
+		return ResponseEntity.ok().body(getMock("get"));
+	}
+	
+	@GetMapping(path = "/authorize/{username}/{password}", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<UserInfoDTO> authorize(@PathVariable(required = true) String username) {
+		// Mock return data
+		return ResponseEntity.ok().body(getMock("authorize"));
 	}
 	
 	
-	private UserInfoDTO getMock() {
+	private UserInfoDTO getMock(String action) {
 		UserInfoDTO mock = new UserInfoDTO();
-		mock.setDisplayName("Mocked User");
+		mock.setDisplayName("Mocked User - " + action);
 		mock.setUsername("mockeduser");
 		return mock;
 	}

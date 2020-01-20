@@ -1,5 +1,7 @@
 package gamehub.usermanager.validation;
 
+import java.util.Objects;
+
 import org.springframework.validation.Errors;
 import org.springframework.validation.Validator;
 
@@ -15,9 +17,11 @@ public class PasswordValidator implements Validator {
 	@Override
 	public void validate(Object target, Errors errors) {
 		UserCreateDTO user = (UserCreateDTO)target;
-			
-		if(!(user.getPassword().equals(user.getPasswordRepeat()))){
-			errors.rejectValue("password", "notmatch.password");
+		
+		if (Objects.isNull(user.getPassword())) {
+			errors.rejectValue("password", "null.password");
+		} else if (!(user.getPassword().equals(user.getPasswordRepeat()))){
+			errors.rejectValue("passwordRepeat", "notmatch.password");
 		}
 	}
 
