@@ -3,7 +3,7 @@ package gamehub.usermanager.dto;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
-public class UserCreateDTO extends UserPasswordChange {
+public class UserCreateDTO extends UserPasswordChangeDTO {
 
 	@Size(min = 5, max = 16)
 	private String displayName;

@@ -3,15 +3,20 @@ package gamehub.usermanager.dto;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
-public class UserPasswordChange {
+import gamehub.usermanager.validation.PasswordConfirmation;
+
+@PasswordConfirmation(passwordConfirmField = "passwordRepeat")
+public class UserPasswordChangeDTO {
 	
 	@NotBlank
 	@Size(min = 5, max = 16)
 	private String password;
 	
+	@NotBlank
+	@Size(min = 5, max = 16)
 	private String passwordRepeat;
 
-
+	
 	public String getPassword() {
 		return password;
 	}
