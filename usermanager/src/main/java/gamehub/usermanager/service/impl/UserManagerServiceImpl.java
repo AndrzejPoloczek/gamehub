@@ -19,10 +19,7 @@ public class UserManagerServiceImpl implements UserManagerService {
 	
 	@Override
 	public User create(String displayName, String username, String password) {
-		final Optional<User> userOpt = users.stream()
-				.filter(user -> user.getUsername().equals(username))
-				.findFirst();
-		if (!userOpt.isPresent()) {
+		if (!getByUsername(username).isPresent()) {
 			final User user = new User((StringUtils.isNotBlank(displayName) ? displayName : username), username, password);
 			users.add(user);
 			return user;
@@ -40,9 +37,7 @@ public class UserManagerServiceImpl implements UserManagerService {
 
 	@Override
 	public User get(String username) {
-		return users.stream()
-			.filter(user -> user.getUsername().equals(username))
-			.findFirst()
+		return getByUsername(username)
 			.orElseThrow(() -> new UserNotFoundException(String.format("No user with username %s found", username)));
 	}
 
@@ -58,6 +53,12 @@ public class UserManagerServiceImpl implements UserManagerService {
 				.filter(user -> user.getUsername().equals(username) && user.getPassword().equals(password))
 				.findFirst()
 				.isPresent();
+	}
+	
+	private Optional<User> getByUsername(String username) {
+		return users.stream()
+				.filter(user -> user.getUsername().equals(username))
+				.findFirst();
 	}
 
 }
