@@ -1,4 +1,4 @@
-package gamehub.usermanager.error;
+package gamehub.sdk.error;
 
 import java.util.Collections;
 import java.util.Optional;

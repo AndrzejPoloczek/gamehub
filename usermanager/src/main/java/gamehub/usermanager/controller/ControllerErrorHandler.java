@@ -7,7 +7,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import gamehub.usermanager.error.ApiError;
+import gamehub.sdk.error.ApiError;
 import gamehub.usermanager.exception.UserAlreadyExistsException;
 import gamehub.usermanager.exception.UserNotFoundException;
 
