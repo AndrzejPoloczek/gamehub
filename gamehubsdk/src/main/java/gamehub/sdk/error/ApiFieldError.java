@@ -1,4 +1,4 @@
-package gamehub.usermanager.error;
+package gamehub.sdk.error;
 
 class ApiFieldError {
 
