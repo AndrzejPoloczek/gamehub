@@ -11,9 +11,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import gamehub.usermanager.dto.UserCreateDTO;
-import gamehub.usermanager.dto.UserInfoDTO;
-import gamehub.usermanager.dto.UserPasswordChangeDTO;
+import gamehub.sdk.user.model.UserCreateDTO;
+import gamehub.sdk.user.model.UserInfoDTO;
+import gamehub.sdk.user.model.UserPasswordChangeDTO;
 import gamehub.usermanager.dto.UserUpdateDTO;
 import gamehub.usermanager.model.User;
 import gamehub.usermanager.service.UserManagerService;
