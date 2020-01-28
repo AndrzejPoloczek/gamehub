@@ -1,9 +1,9 @@
-package gamehub.usermanager.validation;
+package gamehub.sdk.validation;
 
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-import gamehub.usermanager.dto.UserPasswordChangeDTO;
+import gamehub.sdk.user.model.UserPasswordChangeDTO;
 
 public class PasswordConfirmationValidator implements ConstraintValidator<PasswordConfirmation, UserPasswordChangeDTO> {
 

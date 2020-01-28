@@ -1,9 +1,9 @@
-package gamehub.usermanager.dto;
+package gamehub.sdk.user.model;
 
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.Size;
 
-import gamehub.usermanager.validation.PasswordConfirmation;
+import gamehub.sdk.validation.PasswordConfirmation;
 
 @PasswordConfirmation(passwordConfirmField = "passwordRepeat")
 public class UserPasswordChangeDTO {

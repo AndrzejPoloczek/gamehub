@@ -16,7 +16,9 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import gamehub.usermanager.dto.UserPasswordChangeDTO;
+import gamehub.sdk.user.model.UserPasswordChangeDTO;
+import gamehub.sdk.validation.PasswordConfirmation;
+import gamehub.sdk.validation.PasswordConfirmationValidator;
 
 @RunWith(MockitoJUnitRunner.class)
 public class PasswordConfirmationValidatorTest {

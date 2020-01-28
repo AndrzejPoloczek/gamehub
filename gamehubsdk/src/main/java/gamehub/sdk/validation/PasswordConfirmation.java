@@ -1,4 +1,4 @@
-package gamehub.usermanager.validation;
+package gamehub.sdk.validation;
 
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;

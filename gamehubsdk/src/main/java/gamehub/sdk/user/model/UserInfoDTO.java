@@ -1,4 +1,4 @@
-package gamehub.usermanager.dto;
+package gamehub.sdk.user.model;
 
 public class UserInfoDTO {
 
