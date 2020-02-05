@@ -13,9 +13,13 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 
 public class ApiError {
 
-	final private HttpStatus status;
-	final private String message;
-	final private Set<ApiFieldError> errors;
+	private HttpStatus status;
+	private String message;
+	private Set<ApiFieldError> errors;
+	
+	public ApiError() {
+		
+	}
 	
 	public ApiError(HttpStatus status, String message, Set<ApiFieldError> errors) {
 		this.status = status;

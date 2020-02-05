@@ -2,7 +2,9 @@ package gamehub.usermanager;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 
+@EnableDiscoveryClient
 @SpringBootApplication
 public class UserManagerApp {
 
@@ -10,3 +12,4 @@ public class UserManagerApp {
 		SpringApplication.run(UserManagerApp.class, args);
 	}
 }
+
