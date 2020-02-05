@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 import gamehub.sdk.user.model.UserCreateDTO;
 import gamehub.sdk.user.model.UserInfoDTO;
 import gamehub.sdk.user.model.UserPasswordChangeDTO;
-import gamehub.usermanager.dto.UserUpdateDTO;
+import gamehub.sdk.user.model.UserUpdateDTO;
 import gamehub.usermanager.model.User;
 import gamehub.usermanager.service.UserManagerService;
 
