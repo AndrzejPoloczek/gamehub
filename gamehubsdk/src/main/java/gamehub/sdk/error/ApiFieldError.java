@@ -2,9 +2,13 @@ package gamehub.sdk.error;
 
 class ApiFieldError {
 
-	final private String fieldname;
-	final private String code;
-	final private String message;
+	private String fieldname;
+	private String code;
+	private String message;
+	
+	public ApiFieldError() {
+		
+	}
 	
 	public ApiFieldError(String fieldname, String code, String message) {
 		this.fieldname = fieldname;

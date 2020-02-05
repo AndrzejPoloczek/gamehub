@@ -1,5 +1,0 @@
-{"properties": [{
-  "name": "api.version",
-  "type": "java.lang.String",
-  "description": "Service current verion'"
-}]}
