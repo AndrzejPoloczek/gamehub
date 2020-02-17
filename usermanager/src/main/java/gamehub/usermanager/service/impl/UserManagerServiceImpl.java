@@ -5,6 +5,7 @@ import java.util.Optional;
 import java.util.Set;
 
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import gamehub.usermanager.exception.UserAlreadyExistsException;
@@ -12,15 +13,23 @@ import gamehub.usermanager.exception.UserNotFoundException;
 import gamehub.usermanager.model.User;
 import gamehub.usermanager.service.UserManagerService;
 
+import javax.annotation.PostConstruct;
+
 @Service
 public class UserManagerServiceImpl implements UserManagerService {
 
 	private Set<User> users = new HashSet<>();
-	
+	private BCryptPasswordEncoder passwordEncoder;
+
+	@PostConstruct
+	public void init() {
+		passwordEncoder = new BCryptPasswordEncoder();
+	}
+
 	@Override
 	public User create(String displayName, String username, String password) {
 		if (!getByUsername(username).isPresent()) {
-			final User user = new User((StringUtils.isNotBlank(displayName) ? displayName : username), username, password);
+			final User user = new User((StringUtils.isNotBlank(displayName) ? displayName : username), username, passwordEncoder.encode(password));
 			users.add(user);
 			return user;
 		} else {
@@ -50,11 +59,11 @@ public class UserManagerServiceImpl implements UserManagerService {
 	@Override
 	public boolean authorize(String username, String password) {
 		return users.stream()
-				.filter(user -> user.getUsername().equals(username) && user.getPassword().equals(password))
+				.filter(user -> user.getUsername().equals(username) && passwordEncoder.matches(password, user.getPassword()))
 				.findFirst()
 				.isPresent();
 	}
-	
+
 	private Optional<User> getByUsername(String username) {
 		return users.stream()
 				.filter(user -> user.getUsername().equals(username))

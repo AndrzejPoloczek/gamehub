@@ -8,7 +8,7 @@
         <version>2.2.2.RELEASE</version>
     </parent>
     <groupId>gamehub</groupId>
-    <artifactId>sdk</artifactId>
+    <artifactId>gamehub-sdk</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <packaging>jar</packaging>
     <name>Game Hub SDK</name>
@@ -22,7 +22,7 @@
 		<dependency>
         	<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
-		</dependency>  
+		</dependency>
     	<dependency>
       		<groupId>junit</groupId>
       		<artifactId>junit</artifactId>
