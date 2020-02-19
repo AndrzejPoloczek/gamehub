@@ -8,6 +8,7 @@ import javax.validation.ConstraintValidatorContext;
 import javax.validation.ConstraintValidatorContext.ConstraintViolationBuilder;
 import javax.validation.ConstraintValidatorContext.ConstraintViolationBuilder.NodeBuilderCustomizableContext;
 
+import gamehub.sdk.dto.user.UserPasswordChangeDTO;
 import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
@@ -16,7 +17,6 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
 
-import gamehub.sdk.user.model.UserPasswordChangeDTO;
 import gamehub.sdk.validation.PasswordConfirmation;
 import gamehub.sdk.validation.PasswordConfirmationValidator;
 

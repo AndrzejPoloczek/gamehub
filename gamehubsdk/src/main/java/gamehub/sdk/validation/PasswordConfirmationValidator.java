@@ -3,7 +3,7 @@ package gamehub.sdk.validation;
 import javax.validation.ConstraintValidator;
 import javax.validation.ConstraintValidatorContext;
 
-import gamehub.sdk.user.model.UserPasswordChangeDTO;
+import gamehub.sdk.dto.user.UserPasswordChangeDTO;
 
 public class PasswordConfirmationValidator implements ConstraintValidator<PasswordConfirmation, UserPasswordChangeDTO> {
 

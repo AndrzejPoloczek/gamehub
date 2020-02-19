@@ -37,8 +37,8 @@
    		
    		<dependency>
 			<groupId>gamehub</groupId>
-			<artifactId>sdk</artifactId>
-			<version>0.0.1-SNAPSHOT</version>
+			<artifactId>gamehub-sdk</artifactId>
+			<version>0.0.2-SNAPSHOT</version>
 			<scope>compile</scope>
 		</dependency>
    		
@@ -88,6 +88,10 @@
 			<id>spring-milestones</id>
 			<name>Spring Milestones</name>
 			<url>https://repo.spring.io/milestone</url>
+		</repository>
+		<repository>
+			<id>gamehub-repo</id>
+			<url>file://${basedir}/../maven-repo</url>
 		</repository>
 	</repositories>
 

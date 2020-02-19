@@ -1,22 +1,20 @@
-package gamehub.gamebind.dto;
+package gamehub.sdk.dto.gamebind;
 
 import java.util.List;
 
-import gamehub.gamebind.model.GameType;
-
 public class GameBindDTO {
 
-	private GameType type;
+	private String type;
 	private String guid;
 	private String owner;
 	private List<String> players;
 	
 	
-	public GameType getType() {
+	public String getType() {
 		return type;
 	}
 
-	public void setType(GameType type) {
+	public void setType(String type) {
 		this.type = type;
 	}
 	

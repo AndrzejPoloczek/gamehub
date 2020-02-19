@@ -1,4 +1,4 @@
-package gamehub.sdk.user.model;
+package gamehub.sdk.dto.user;
 
 import javax.validation.constraints.Size;
 

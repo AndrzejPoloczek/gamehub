@@ -2,7 +2,8 @@ package gamehub.api.config.security;
 
 import gamehub.api.clients.UserManagerClient;
 import gamehub.api.session.SessionUser;
-import gamehub.sdk.user.model.UserAuthorizeDTO;
+import gamehub.sdk.dto.user.UserAuthorizeDTO;
+import gamehub.sdk.dto.user.UserInfoDTO;
 import org.apache.commons.lang3.BooleanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -28,12 +29,13 @@ public class GHAuthenticationProvider implements AuthenticationProvider {
     @Override
     public Authentication authenticate(Authentication auth) throws AuthenticationException {
 
-        sessionUser.setUsername(null);
+        upadteSessionUser(null, null);
         UserAuthorizeDTO userAuth = createUserAuth(auth);
 
         ResponseEntity<Boolean> response = userManagerClient.authorize(userAuth);
         if (BooleanUtils.isTrue(response.getBody())) {
-            sessionUser.setUsername(userAuth.getUsername());
+            ResponseEntity<UserInfoDTO> userInfo = userManagerClient.getByUsername(userAuth.getUsername());
+            upadteSessionUser(userInfo.getBody().getUsername(), userInfo.getBody().getDisplayName());
             return new UsernamePasswordAuthenticationToken
                     (userAuth.getUsername(), userAuth.getPassword(), Collections.emptyList());
         } else {
@@ -46,6 +48,11 @@ public class GHAuthenticationProvider implements AuthenticationProvider {
         userAuth.setUsername(auth.getName());
         userAuth.setPassword(auth.getCredentials().toString());
         return userAuth;
+    }
+
+    private void upadteSessionUser(String username, String displayName) {
+        sessionUser.setUsername(username);
+        sessionUser.setDisplayName(displayName);
     }
 
     @Override
