@@ -1,15 +1,12 @@
-package gamehub.api.session;
+package gamehub.sdk.dto.gamebind;
 
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
-import org.springframework.stereotype.Component;
+import javax.validation.constraints.NotBlank;
 
-@Component
-@Scope(scopeName = "session", proxyMode = ScopedProxyMode.TARGET_CLASS)
-public class SessionUser {
+public class PlayerDTO {
 
-    private static final long serialVersionUID = 1L;
+    @NotBlank
     private String username;
+    @NotBlank
     private String displayName;
 
 

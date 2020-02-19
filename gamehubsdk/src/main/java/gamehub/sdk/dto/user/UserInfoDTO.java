@@ -1,17 +1,9 @@
-package gamehub.sdk.user.model;
+package gamehub.sdk.dto.user;
 
-import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.Size;
+public class UserInfoDTO {
 
-public class UserCreateDTO extends UserPasswordChangeDTO {
-
-	@Size(min = 5, max = 16)
 	private String displayName;
-	
-	@NotBlank
-	@Size(min = 5, max = 16)
 	private String username;
-	
 	
 	public String getDisplayName() {
 		return displayName;

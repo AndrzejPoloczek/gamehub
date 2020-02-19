@@ -1,6 +1,6 @@
 package gamehub.api.clients;
 
-import gamehub.sdk.user.model.*;
+import gamehub.sdk.dto.user.*;
 import org.springframework.cloud.openfeign.FeignClient;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;

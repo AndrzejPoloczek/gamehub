@@ -1,17 +1,9 @@
-package gamehub.api.session;
+package gamehub.gamebind.model;
 
-import org.springframework.context.annotation.Scope;
-import org.springframework.context.annotation.ScopedProxyMode;
-import org.springframework.stereotype.Component;
+public class Player {
 
-@Component
-@Scope(scopeName = "session", proxyMode = ScopedProxyMode.TARGET_CLASS)
-public class SessionUser {
-
-    private static final long serialVersionUID = 1L;
     private String username;
     private String displayName;
-
 
     public String getUsername() {
         return username;

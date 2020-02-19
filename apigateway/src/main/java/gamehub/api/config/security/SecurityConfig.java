@@ -18,13 +18,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
             "/webjars/**"
     };
 
-    @Autowired
     private GHAuthenticationProvider ghAuthenticationProvider;
-
-    @Autowired
     private GHAuthenticationEntryPoint ghAuthenticationEntryPoint;
-
-    @Autowired
     private GHAuthenticationSuccessHandler ghAuthenticationSuccessHandler;
 
     @Autowired
@@ -50,5 +45,20 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                     .logout()
                     .logoutSuccessHandler(ghLogoutSuccessHandler);
+    }
+
+    @Autowired
+    public void setGhAuthenticationProvider(GHAuthenticationProvider ghAuthenticationProvider) {
+        this.ghAuthenticationProvider = ghAuthenticationProvider;
+    }
+
+    @Autowired
+    public void setGhAuthenticationEntryPoint(GHAuthenticationEntryPoint ghAuthenticationEntryPoint) {
+        this.ghAuthenticationEntryPoint = ghAuthenticationEntryPoint;
+    }
+
+    @Autowired
+    public void setGhAuthenticationSuccessHandler(GHAuthenticationSuccessHandler ghAuthenticationSuccessHandler) {
+        this.ghAuthenticationSuccessHandler = ghAuthenticationSuccessHandler;
     }
 }
