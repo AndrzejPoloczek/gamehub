@@ -19,9 +19,8 @@ public class GameBindController extends AbstractController {
 
     @PostMapping(path = "/create", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<GameBindDTO> create(@RequestBody ApiGameCreateDTO form) {
-        validateSessionUser();
         GameCreateDTO create = new GameCreateDTO();
-        create.setUsername(getSessionUser().getDisplayName());
+        create.setUsername(getValidSessionUsername());
         create.setDisplayName(getSessionUser().getDisplayName());
         create.setType(form.getType());
         create.setPlayers(form.getPlayers());

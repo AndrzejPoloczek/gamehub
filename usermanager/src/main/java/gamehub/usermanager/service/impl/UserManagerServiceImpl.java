@@ -53,15 +53,13 @@ public class UserManagerServiceImpl implements UserManagerService {
 	@Override
 	public void changePassword(String username, String newPassword) {
 		final User user = get(username);
-		user.setPassword(newPassword);
+		user.setPassword(passwordEncoder.encode(newPassword));
 	}
 
 	@Override
 	public boolean authorize(String username, String password) {
 		return users.stream()
-				.filter(user -> user.getUsername().equals(username) && passwordEncoder.matches(password, user.getPassword()))
-				.findFirst()
-				.isPresent();
+				.anyMatch(user -> user.getUsername().equals(username) && passwordEncoder.matches(password, user.getPassword()));
 	}
 
 	private Optional<User> getByUsername(String username) {

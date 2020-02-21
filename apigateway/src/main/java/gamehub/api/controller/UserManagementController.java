@@ -27,28 +27,23 @@ public class UserManagementController extends AbstractController {
 
 	@PostMapping(path = "/create", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<UserInfoDTO> create(@Valid @RequestBody UserCreateDTO user) {
-		user.setPassword(user.getPassword());
 		return userManagerClient.create(user);
 	}
 
 	@GetMapping(path = "/get", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<UserInfoDTO> getByUsername() {
-		validateSessionUser();
-		return userManagerClient.getByUsername(getSessionUser().getUsername());
+		return userManagerClient.getByUsername(getValidSessionUsername());
 
 	}
 
 	@PostMapping(path = "/update", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<UserInfoDTO> update(@Valid @RequestBody UserUpdateDTO user) {
-		validateSessionUser();
-		return userManagerClient.update(getSessionUser().getUsername(), user);
+		return userManagerClient.update(getValidSessionUsername(), user);
 	}
 
 	@PostMapping(path = "/changePassword")
 	public ResponseEntity<Object> changePassword(@Valid @RequestBody UserPasswordChangeDTO password) {
-		validateSessionUser();
-		password.setPassword(password.getPassword());
-		return userManagerClient.changePassword(getSessionUser().getUsername(), password);
+		return userManagerClient.changePassword(getValidSessionUsername(), password);
 	}
 
 	@Autowired

@@ -20,6 +20,11 @@ public class AbstractController {
         return sessionUser;
     }
 
+    protected String getValidSessionUsername() {
+        validateSessionUser();
+        return sessionUser.getUsername();
+    }
+
     @Autowired
     public void setSessionUser(SessionUser sessionUser) {
         this.sessionUser = sessionUser;
