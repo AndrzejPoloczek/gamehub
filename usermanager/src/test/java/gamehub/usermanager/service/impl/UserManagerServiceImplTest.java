@@ -25,6 +25,8 @@ public class UserManagerServiceImplTest {
 	private static final String USERNAME_2 = "username_2";
 	private static final String PASSWORD = "password";
 	private static final String PASSWORD_ENCODED = "password_encoded";
+	private static final String NEW_PASSWORD = "new_password";
+	private static final String NEW_PASSWORD_ENCODED = "new_password_encoded";
 
 	@InjectMocks
 	private UserManagerServiceImpl testObj;
@@ -39,6 +41,7 @@ public class UserManagerServiceImplTest {
 	@Before
 	public void setUp() {
 		when(passwordEncoder.encode(PASSWORD)).thenReturn(PASSWORD_ENCODED);
+		when(passwordEncoder.encode(NEW_PASSWORD)).thenReturn(NEW_PASSWORD_ENCODED);
 		when(passwordEncoder.matches(PASSWORD, PASSWORD_ENCODED)).thenReturn(true);
 	}
 
@@ -157,11 +160,11 @@ public class UserManagerServiceImplTest {
 		testObj.create(DISPLAYNAME, USERNAME_1, PASSWORD);
 
 		// when
-		testObj.changePassword(USERNAME_1, "NEWPASS");
+		testObj.changePassword(USERNAME_1, NEW_PASSWORD);
 
 		// then
 		User user = testObj.get(USERNAME_1);
-		Assertions.assertThat(user.getPassword()).isEqualTo("NEWPASS");
+		Assertions.assertThat(user.getPassword()).isEqualTo(NEW_PASSWORD_ENCODED);
 	}
 
 	@Test
