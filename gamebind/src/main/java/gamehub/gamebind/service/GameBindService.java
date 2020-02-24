@@ -24,4 +24,19 @@ public interface GameBindService {
      * @return List of available games
      */
     List<GameBind> getAvailableGames();
+
+    /**
+     * Get all available games with selected type.
+     * @param type Game type
+     * @return
+     */
+    List<GameBind> getAvailableGames(GameType type);
+
+    /**
+     * Join an existing and available game
+     * @param guid
+     * @param player
+     * @return
+     */
+    GameBind join(String guid, Player player) throws GameBindException;
 }
