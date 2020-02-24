@@ -36,7 +36,7 @@ public class GameBindServiceImplTest {
     @Mock
     private GameDefinition gameDef;
     @Mock
-    private Player creator;
+    private Player player;
     @Mock
     private GameBind insertGame, findGame_1, findGame_2, findGame_3;
 
@@ -59,7 +59,7 @@ public class GameBindServiceImplTest {
         thrown.expectMessage("Game type 'SAMPLE_GAME' not found.");
 
         // when
-        testObj.create(GameType.SAMPLE_GAME, creator,2);
+        testObj.create(GameType.SAMPLE_GAME, player,2);
     }
 
     @Test
@@ -70,7 +70,7 @@ public class GameBindServiceImplTest {
         when(gameBindRepository.insert(any())).thenReturn(insertGame);
 
         // when
-        GameBind game = testObj.create(GameType.SAMPLE_GAME, creator,2);
+        GameBind game = testObj.create(GameType.SAMPLE_GAME, player,2);
 
         // then
         verify(gameBindRepository).insert(any());
@@ -92,5 +92,46 @@ public class GameBindServiceImplTest {
         Assertions.assertThat(games.get(0)).isEqualTo(findGame_1);
         Assertions.assertThat(games.get(1)).isEqualTo(findGame_2);
         Assertions.assertThat(games.get(2)).isEqualTo(findGame_3);
+    }
+
+    @Test
+    public void shouldFindProperGamesByType() {
+
+        // given
+        when(gameBindRepository.findAvailable(GameType.SAMPLE_GAME)).thenReturn(Lists.newArrayList(findGame_3));
+
+        // when
+        List<GameBind> games = testObj.getAvailableGames(GameType.SAMPLE_GAME);
+
+        // then
+        Assertions.assertThat(games).isNotNull();
+        Assertions.assertThat(games.size()).isEqualTo(1);
+        Assertions.assertThat(games.get(0)).isEqualTo(findGame_3);
+    }
+
+    @Test
+    public void shouldJoinGame() throws GameBindException {
+
+        // given
+        when(gameBindRepository.join("guid", player)).thenReturn(insertGame);
+
+        // when
+        GameBind result = testObj.join("guid", player);
+
+        // then
+        verify(gameBindRepository).join("guid", player);
+        Assertions.assertThat(result).isEqualTo(insertGame);
+    }
+
+    @Test
+    public void shouldNotJoinGameCauseByException() throws GameBindException {
+
+        // given
+        when(gameBindRepository.join("guid", player)).thenThrow(new GameBindException("Some Exception"));
+        thrown.expect(GameBindException.class);
+        thrown.expectMessage("Some Exception");
+
+        // when
+        GameBind result = testObj.join("guid", player);
     }
 }

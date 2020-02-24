@@ -1,6 +1,5 @@
 package gamehub.gamebind.controller;
 
-import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -61,10 +60,10 @@ public class GameBindController {
 		return ResponseEntity.ok().body(game);
 	}
 
-	// TODO MOCKED
 	@PutMapping(path = "/join", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<GameBindDTO> join(@Valid @RequestBody GameJoinDTO form) {
-		return ResponseEntity.ok().body(mockGameBindDTO(form.getGuid(), "owner", Arrays.asList("owner", form.getUsername())));
+	public ResponseEntity<GameBindDTO> join(@Valid @RequestBody GameJoinDTO form) throws GameBindException {
+		final GameBindDTO game = gameBindPopulator.populate(gameBindService.join(form.getGuid(), playerPopulator.populate(form)));
+		return ResponseEntity.ok().body(game);
 	}
 
 	@GetMapping(path = "/find", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -75,20 +74,18 @@ public class GameBindController {
 				.collect(Collectors.toList()));
 	}
 
+	@GetMapping(path = "/find/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<List<GameBindDTO>> findByType(@PathVariable String type) {
+		return ResponseEntity.ok().body(gameBindService.getAvailableGames(GameType.valueOf(type))
+				.stream()
+				.map(gameBindPopulator::populate)
+				.collect(Collectors.toList()));
+	}
+
 	// TODO MOCKED
 	@GetMapping(path = "/check/{guid}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<GameBindStatus> check(@PathVariable(required = true) String guid) {
 		return ResponseEntity.ok().body("ok".equals(guid) ? GameBindStatus.OPEN : GameBindStatus.CLOSED);
-	}
-	
-	
-	private GameBindDTO mockGameBindDTO(String guid, String owner, List<String> players) {
-		GameBindDTO mock = new GameBindDTO();
-		mock.setType("SAMPLE_GAME");
-		mock.setGuid(guid);
-		mock.setOwner(owner);
-		mock.setPlayers(players);
-		return mock;
 	}
 
 	@Autowired

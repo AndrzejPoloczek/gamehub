@@ -41,6 +41,16 @@ public class GameBindServiceImpl implements GameBindService {
         return gameBindRepository.findAvailable();
     }
 
+    @Override
+    public List<GameBind> getAvailableGames(GameType type) {
+        return gameBindRepository.findAvailable(type);
+    }
+
+    @Override
+    public GameBind join(String guid, Player player) throws GameBindException {
+        return gameBindRepository.join(guid, player);
+    }
+
     private void validateGameType(GameType type) throws GameBindException {
         if (!availableGames.getGameByType(type).isPresent()) {
             throw new GameBindException(String.format("Game type '%s' not found.", type));
