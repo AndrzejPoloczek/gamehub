@@ -11,18 +11,13 @@ public class AbstractController {
     private SessionUser sessionUser;
 
     protected void validateSessionUser() {
-        if (StringUtils.isBlank(sessionUser.getUsername())) {
+        if (StringUtils.isBlank(sessionUser.getUsername()) || StringUtils.isBlank(sessionUser.getDisplayName())) {
             throw new IllegalStateException("Session user is no valid, You need to login again.");
         }
     }
 
     protected SessionUser getSessionUser() {
         return sessionUser;
-    }
-
-    protected String getValidSessionUsername() {
-        validateSessionUser();
-        return sessionUser.getUsername();
     }
 
     @Autowired
