@@ -1,6 +1,6 @@
 /target/
-/.project
 /.classpath
+/.project
 /.settings
 /.idea
-/gamehub-sdk.iml
+/game-play-service.iml
