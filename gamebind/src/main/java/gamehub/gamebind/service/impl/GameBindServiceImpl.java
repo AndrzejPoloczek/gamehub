@@ -1,15 +1,19 @@
 package gamehub.gamebind.service.impl;
 
+import gamehub.gamebind.component.GamePlayGuidRetryable;
 import gamehub.gamebind.config.AvailableGames;
 import gamehub.gamebind.exception.GameBindException;
+import gamehub.gamebind.exception.GamePlayGuidException;
 import gamehub.gamebind.model.*;
 import gamehub.gamebind.repository.GameBindRepository;
 import gamehub.gamebind.service.GameBindService;
+import gamehub.sdk.enums.GameType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import java.util.*;
+import java.util.concurrent.Executors;
 
 
 @Service
@@ -19,21 +23,15 @@ public class GameBindServiceImpl implements GameBindService {
     private AvailableGames availableGames;
 
     private GameBindRepository gameBindRepository;
+    private GamePlayGuidRetryable gamePlayGuidRetryable;
 
 
     @Override
-    public GameBind create(GameType type, Player creator, int players) throws GameBindException {
-        validateGameType(type);
-        List<Player> playersList = new ArrayList<>();
-        playersList.add(creator);
-        GameBind gameBind = new GameBind();
-        gameBind.setGuid(UUID.randomUUID().toString());
-        gameBind.setType(type);
-        gameBind.setOwner(creator);
-        gameBind.setExpectedPlayers(players);
-        gameBind.setStatus(GameBindStatus.OPEN);
-        gameBind.setPlayers(playersList);
-        return gameBindRepository.insert(gameBind);
+    public GameBind create(final GameBind gameBind) throws GameBindException {
+        validateGameType(gameBind.getType());
+        final GameBind created = gameBindRepository.insert(gameBind);
+        handleBindFilled(created);
+        return created;
     }
 
     @Override
@@ -48,7 +46,36 @@ public class GameBindServiceImpl implements GameBindService {
 
     @Override
     public GameBind join(String guid, Player player) throws GameBindException {
-        return gameBindRepository.join(guid, player);
+        final GameBind gameBind = gameBindRepository.join(guid, player);
+        handleBindFilled(gameBind);
+        return gameBind;
+    }
+
+    private void handleBindFilled(final GameBind gameBind) throws GameBindException {
+        if (gameBind.getExpectedPlayers() == gameBind.getPlayers().size()) {
+            gameBindRepository.update(gameBind.getGuid(), Optional.of(GameBindStatus.CLOSED), Optional.empty());
+            Executors.newSingleThreadExecutor().execute(() -> updateGamePlayGuid(gameBind.getGuid(), findPlayGuid(gameBind)));
+        }
+    }
+
+    private Optional<String> findPlayGuid(final GameBind gameBind) {
+        try {
+            return Optional.of(gamePlayGuidRetryable.getGuid(gameBind));
+        } catch (GamePlayGuidException e) {
+            return Optional.empty();
+        }
+    }
+
+    private void updateGamePlayGuid(final String guid, final Optional<String> gamePlayGuid) {
+        try {
+            if (gamePlayGuid.isPresent()) {
+                gameBindRepository.update(guid, Optional.empty(), gamePlayGuid);
+            } else {
+                gameBindRepository.update(guid, Optional.of(GameBindStatus.CANCELED), Optional.empty());
+            }
+        } catch (GameBindException e) {
+            e.printStackTrace();
+        }
     }
 
     private void validateGameType(GameType type) throws GameBindException {
@@ -57,8 +84,14 @@ public class GameBindServiceImpl implements GameBindService {
         }
     }
 
+
     @Autowired
     public void setGameBindRepository(GameBindRepository gameBindRepository) {
         this.gameBindRepository = gameBindRepository;
+    }
+
+    @Autowired
+    public void setGamePlayGuidRetryable(GamePlayGuidRetryable gamePlayGuidRetryable) {
+        this.gamePlayGuidRetryable = gamePlayGuidRetryable;
     }
 }

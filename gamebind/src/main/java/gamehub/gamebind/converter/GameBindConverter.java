@@ -1,8 +1,9 @@
-package gamehub.gamebind.populator;
+package gamehub.gamebind.converter;
 
 import gamehub.gamebind.model.GameBind;
 import gamehub.gamebind.model.Player;
 import gamehub.sdk.dto.gamebind.GameBindDTO;
+import org.springframework.core.convert.converter.Converter;
 import org.springframework.stereotype.Component;
 
 import java.util.Collections;
@@ -11,14 +12,16 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Component
-public class GameBindPopulator implements Populator<GameBind, GameBindDTO> {
+public class GameBindConverter implements Converter<GameBind, GameBindDTO> {
 
     @Override
-    public void populate(GameBind source, GameBindDTO target) {
+    public GameBindDTO convert(GameBind source) {
+        GameBindDTO target = new GameBindDTO();
         target.setGuid(source.getGuid());
         target.setType(source.getType().name());
         target.setOwner(source.getOwner().getDisplayName());
         target.setPlayers(populatePlayers(source));
+        return target;
     }
 
     private List<String> populatePlayers(GameBind source) {
@@ -28,12 +31,5 @@ public class GameBindPopulator implements Populator<GameBind, GameBindDTO> {
                 .stream()
                 .map(Player::getDisplayName)
                 .collect(Collectors.toList());
-    }
-
-    @Override
-    public GameBindDTO populate(GameBind source) {
-        GameBindDTO target = new GameBindDTO();
-        populate(source, target);
-        return target;
     }
 }
