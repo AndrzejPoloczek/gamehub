@@ -3,15 +3,13 @@ package gamehub.gamebind.repository.impl;
 import gamehub.gamebind.exception.GameBindException;
 import gamehub.gamebind.model.GameBind;
 import gamehub.gamebind.model.GameBindStatus;
-import gamehub.gamebind.model.GameType;
 import gamehub.gamebind.model.Player;
 import gamehub.gamebind.repository.GameBindRepository;
+import gamehub.sdk.enums.GameType;
 import org.springframework.stereotype.Repository;
 
 import javax.annotation.PostConstruct;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Repository
@@ -26,6 +24,7 @@ public class GameBindRepositoryImpl implements GameBindRepository {
 
     @Override
     public GameBind insert(GameBind gameBind) {
+        gameBind.setGuid(UUID.randomUUID().toString());
         games.put(gameBind.getGuid(), gameBind);
         return gameBind;
     }
@@ -38,9 +37,6 @@ public class GameBindRepositoryImpl implements GameBindRepository {
                 throw new GameBindException("Game is not available anomore");
             }
             game.getPlayers().add(player);
-            if (game.getExpectedPlayers() == game.getPlayers().size()) {
-                game.setStatus(GameBindStatus.CLOSED);
-            }
         }
         return game;
     }
@@ -67,6 +63,15 @@ public class GameBindRepositoryImpl implements GameBindRepository {
                 .stream()
                 .filter(game -> canJoin(game, type))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public void update(String guid, Optional<GameBindStatus> newStatus, Optional<String> gamePlayGuid) throws GameBindException {
+        final GameBind game = findByGuid(guid);
+        synchronized (game) {
+            newStatus.ifPresent(game::setStatus);
+            gamePlayGuid.ifPresent(game::setGamePlayGuid);
+        }
     }
 
     private boolean canJoin(GameBind game) {

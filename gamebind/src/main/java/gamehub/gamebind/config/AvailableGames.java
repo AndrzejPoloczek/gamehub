@@ -3,12 +3,12 @@ package gamehub.gamebind.config;
 import java.util.List;
 import java.util.Optional;
 
+import gamehub.sdk.enums.GameType;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Component;
 
 import gamehub.gamebind.model.GameDefinition;
-import gamehub.gamebind.model.GameType;
 
 @Component
 @PropertySource("classpath:available-games.properties")

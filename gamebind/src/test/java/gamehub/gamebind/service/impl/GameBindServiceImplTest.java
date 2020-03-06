@@ -5,6 +5,7 @@ import gamehub.gamebind.config.AvailableGames;
 import gamehub.gamebind.exception.GameBindException;
 import gamehub.gamebind.model.*;
 import gamehub.gamebind.repository.GameBindRepository;
+import gamehub.sdk.enums.GameType;
 import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Rule;
@@ -45,6 +46,7 @@ public class GameBindServiceImplTest {
 
     @Before
     public void setUp() {
+        when(insertGame.getType()).thenReturn(GameType.SAMPLE_GAME);
         when(gameDef.getType()).thenReturn(GameType.SAMPLE_GAME);
         when(findGame_1.getStatus()).thenReturn(GameBindStatus.OPEN);
         when(findGame_2.getStatus()).thenReturn(GameBindStatus.OPEN);
@@ -59,7 +61,7 @@ public class GameBindServiceImplTest {
         thrown.expectMessage("Game type 'SAMPLE_GAME' not found.");
 
         // when
-        testObj.create(GameType.SAMPLE_GAME, player,2);
+        testObj.create(insertGame);
     }
 
     @Test
@@ -70,10 +72,10 @@ public class GameBindServiceImplTest {
         when(gameBindRepository.insert(any())).thenReturn(insertGame);
 
         // when
-        GameBind game = testObj.create(GameType.SAMPLE_GAME, player,2);
+        GameBind game = testObj.create(insertGame);
 
         // then
-        verify(gameBindRepository).insert(any());
+        verify(gameBindRepository).insert(insertGame);
         Assertions.assertThat(game).isEqualTo(insertGame);
     }
 

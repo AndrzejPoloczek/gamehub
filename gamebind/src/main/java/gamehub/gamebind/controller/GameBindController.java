@@ -7,13 +7,15 @@ import java.util.stream.Collectors;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 
+import gamehub.gamebind.converter.CreateGameConverter;
+import gamehub.gamebind.converter.GameBindConverter;
+import gamehub.gamebind.converter.PlayerConverter;
 import gamehub.gamebind.exception.GameBindException;
-import gamehub.gamebind.populator.GameBindPopulator;
-import gamehub.gamebind.populator.PlayerPopulator;
 import gamehub.gamebind.service.GameBindService;
 import gamehub.sdk.dto.gamebind.GameBindDTO;
 import gamehub.sdk.dto.gamebind.GameCreateDTO;
 import gamehub.sdk.dto.gamebind.GameJoinDTO;
+import gamehub.sdk.enums.GameType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -27,7 +29,6 @@ import org.springframework.web.bind.annotation.RestController;
 import gamehub.gamebind.config.AvailableGames;
 import gamehub.gamebind.model.GameBindStatus;
 import gamehub.gamebind.model.GameDefinition;
-import gamehub.gamebind.model.GameType;
 
 @RestController
 public class GameBindController {
@@ -36,8 +37,9 @@ public class GameBindController {
 	private AvailableGames games;
 
 	private GameBindService gameBindService;
-	private PlayerPopulator playerPopulator;
-	private GameBindPopulator gameBindPopulator;
+	private GameBindConverter gameBindConverter;
+	private CreateGameConverter createGameConverter;
+	private PlayerConverter playerConverter;
 
 	
 	@GetMapping(path = "/games", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -56,13 +58,13 @@ public class GameBindController {
 	
 	@PostMapping(path = "/create", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<GameBindDTO> create(@Valid @RequestBody GameCreateDTO form) throws GameBindException {
-		final GameBindDTO game = gameBindPopulator.populate(gameBindService.create(GameType.valueOf(form.getType()), playerPopulator.populate(form), form.getPlayers()));
+		final GameBindDTO game = gameBindConverter.convert(gameBindService.create(createGameConverter.convert(form)));
 		return ResponseEntity.ok().body(game);
 	}
 
 	@PutMapping(path = "/join", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<GameBindDTO> join(@Valid @RequestBody GameJoinDTO form) throws GameBindException {
-		final GameBindDTO game = gameBindPopulator.populate(gameBindService.join(form.getGuid(), playerPopulator.populate(form)));
+		final GameBindDTO game = gameBindConverter.convert(gameBindService.join(form.getGuid(), playerConverter.convert(form)));
 		return ResponseEntity.ok().body(game);
 	}
 
@@ -70,7 +72,7 @@ public class GameBindController {
 	public ResponseEntity<List<GameBindDTO>> find() {
 		return ResponseEntity.ok().body(gameBindService.getAvailableGames()
 				.stream()
-				.map(gameBindPopulator::populate)
+				.map(gameBindConverter::convert)
 				.collect(Collectors.toList()));
 	}
 
@@ -78,7 +80,7 @@ public class GameBindController {
 	public ResponseEntity<List<GameBindDTO>> findByType(@PathVariable String type) {
 		return ResponseEntity.ok().body(gameBindService.getAvailableGames(GameType.valueOf(type))
 				.stream()
-				.map(gameBindPopulator::populate)
+				.map(gameBindConverter::convert)
 				.collect(Collectors.toList()));
 	}
 
@@ -88,18 +90,24 @@ public class GameBindController {
 		return ResponseEntity.ok().body("ok".equals(guid) ? GameBindStatus.OPEN : GameBindStatus.CLOSED);
 	}
 
+
 	@Autowired
 	public void setGameBindService(GameBindService gameBindService) {
 		this.gameBindService = gameBindService;
 	}
 
 	@Autowired
-	public void setPlayerPopulator(PlayerPopulator playerPopulator) {
-		this.playerPopulator = playerPopulator;
+	public void setGameBindConverter(GameBindConverter gameBindConverter) {
+		this.gameBindConverter = gameBindConverter;
 	}
 
 	@Autowired
-	public void setGameBindPopulator(GameBindPopulator gameBindPopulator) {
-		this.gameBindPopulator = gameBindPopulator;
+	public void setCreateGameConverter(CreateGameConverter createGameConverter) {
+		this.createGameConverter = createGameConverter;
+	}
+
+	@Autowired
+	public void setPlayerConverter(PlayerConverter playerConverter) {
+		this.playerConverter = playerConverter;
 	}
 }

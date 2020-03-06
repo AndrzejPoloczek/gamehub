@@ -1,5 +1,7 @@
 package gamehub.gamebind.model;
 
+import gamehub.sdk.enums.GameType;
+
 public class GameDefinition {
 
 	private GameType type;

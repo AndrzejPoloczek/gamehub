@@ -1,5 +1,7 @@
 package gamehub.gamebind.model;
 
+import gamehub.sdk.enums.GameType;
+
 import java.util.List;
 
 public class GameBind {
@@ -10,6 +12,7 @@ public class GameBind {
     private int expectedPlayers;
     private GameBindStatus status;
     private List<Player> players;
+    private String gamePlayGuid;
 
     public String getGuid() {
         return guid;
@@ -57,5 +60,13 @@ public class GameBind {
 
     public void setPlayers(List<Player> players) {
         this.players = players;
+    }
+
+    public String getGamePlayGuid() {
+        return gamePlayGuid;
+    }
+
+    public void setGamePlayGuid(String gamePlayGuid) {
+        this.gamePlayGuid = gamePlayGuid;
     }
 }
