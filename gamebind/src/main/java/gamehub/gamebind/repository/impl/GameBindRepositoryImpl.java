@@ -76,16 +76,15 @@ public class GameBindRepositoryImpl implements GameBindRepository {
     }
 
     @Override
-    public Set<String> findGamesToRemove() {
+    public Set<GameBind> findGamesToRemove() {
         return games.values().stream()
                 .filter(this::shouldRemove)
-                .map(GameBind::getGuid)
                 .collect(Collectors.toSet());
     }
 
     @Override
-    public void remove(String guid) {
-        games.remove(guid);
+    public void remove(final GameBind gameBind) {
+        games.remove(gameBind.getGuid());
     }
 
     private boolean shouldRemove(final GameBind gameBind) {

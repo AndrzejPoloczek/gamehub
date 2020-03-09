@@ -18,6 +18,6 @@ public interface GameBindRepository {
     List<GameBind> findAvailable();
     List<GameBind> findAvailable(GameType type);
     void update(String guid, Optional<GameBindStatus> newStatus, Optional<String> gamePlayGuid) throws GameBindException;
-    Set<String> findGamesToRemove();
-    void remove(String guid);
+    Set<GameBind> findGamesToRemove();
+    void remove(GameBind gameBind);
 }
