@@ -37,4 +37,11 @@ public interface GameBindService {
      * @return
      */
     GameBind join(String guid, Player player) throws GameBindException;
+
+    /**
+     * CHeck current game state.
+     * @param guid
+     * @return
+     */
+    GameBind updatePlayerStatus(String guid, String username) throws GameBindException;
 }

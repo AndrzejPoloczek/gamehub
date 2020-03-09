@@ -8,6 +8,7 @@ import gamehub.sdk.enums.GameType;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 public interface GameBindRepository {
 
@@ -17,4 +18,6 @@ public interface GameBindRepository {
     List<GameBind> findAvailable();
     List<GameBind> findAvailable(GameType type);
     void update(String guid, Optional<GameBindStatus> newStatus, Optional<String> gamePlayGuid) throws GameBindException;
+    Set<String> findGamesToRemove();
+    void remove(String guid);
 }

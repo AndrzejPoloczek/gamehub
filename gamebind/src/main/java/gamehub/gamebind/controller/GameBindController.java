@@ -9,25 +9,19 @@ import javax.validation.Valid;
 
 import gamehub.gamebind.converter.CreateGameConverter;
 import gamehub.gamebind.converter.GameBindConverter;
+import gamehub.gamebind.converter.BindCheckConverter;
 import gamehub.gamebind.converter.PlayerConverter;
 import gamehub.gamebind.exception.GameBindException;
+import gamehub.gamebind.model.GameBind;
 import gamehub.gamebind.service.GameBindService;
-import gamehub.sdk.dto.gamebind.GameBindDTO;
-import gamehub.sdk.dto.gamebind.GameCreateDTO;
-import gamehub.sdk.dto.gamebind.GameJoinDTO;
+import gamehub.sdk.dto.gamebind.*;
 import gamehub.sdk.enums.GameType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import gamehub.gamebind.config.AvailableGames;
-import gamehub.gamebind.model.GameBindStatus;
 import gamehub.gamebind.model.GameDefinition;
 
 @RestController
@@ -40,6 +34,7 @@ public class GameBindController {
 	private GameBindConverter gameBindConverter;
 	private CreateGameConverter createGameConverter;
 	private PlayerConverter playerConverter;
+	private BindCheckConverter bindCheckConverter;
 
 	
 	@GetMapping(path = "/games", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -84,10 +79,10 @@ public class GameBindController {
 				.collect(Collectors.toList()));
 	}
 
-	// TODO MOCKED
-	@GetMapping(path = "/check/{guid}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<GameBindStatus> check(@PathVariable(required = true) String guid) {
-		return ResponseEntity.ok().body("ok".equals(guid) ? GameBindStatus.OPEN : GameBindStatus.CLOSED);
+	@PutMapping(path = "/update/player/status/{guid}/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<GameBindCheckDTO> updatePlayerStatus(@PathVariable final String guid, @PathVariable final String username) throws GameBindException {
+		final GameBind gameBind = gameBindService.updatePlayerStatus(guid, username);
+		return ResponseEntity.ok().body(bindCheckConverter.convert(gameBind));
 	}
 
 
@@ -109,5 +104,10 @@ public class GameBindController {
 	@Autowired
 	public void setPlayerConverter(PlayerConverter playerConverter) {
 		this.playerConverter = playerConverter;
+	}
+
+	@Autowired
+	public void setBindCheckConverter(BindCheckConverter bindCheckConverter) {
+		this.bindCheckConverter = bindCheckConverter;
 	}
 }
