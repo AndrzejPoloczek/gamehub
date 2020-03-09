@@ -2,10 +2,7 @@ package gamehub.api.controller;
 
 import gamehub.api.clients.GameBindClient;
 import gamehub.api.dto.ApiGameCreateDTO;
-import gamehub.sdk.dto.gamebind.GameBindDTO;
-import gamehub.sdk.dto.gamebind.GameCreateDTO;
-import gamehub.sdk.dto.gamebind.GameJoinDTO;
-import gamehub.sdk.dto.gamebind.PlayerDTO;
+import gamehub.sdk.dto.gamebind.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -48,6 +45,12 @@ public class GameBindController extends AbstractController {
     public ResponseEntity<List<GameBindDTO>> findByType(@PathVariable String type) {
         validateSessionUser();
         return gameBindClient.findByType(type);
+    }
+
+    @PatchMapping(path = "/update/player/status/{guid}", produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<GameBindCheckDTO> updatePlayerStatus(@PathVariable final String guid) {
+        validateSessionUser();
+        return gameBindClient.updatePlayerStatus(guid, getSessionUser().getUsername());
     }
 
     @Autowired

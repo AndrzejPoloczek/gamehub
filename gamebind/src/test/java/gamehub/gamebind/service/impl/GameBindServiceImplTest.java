@@ -20,8 +20,7 @@ import java.util.List;
 import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 public class GameBindServiceImplTest {
@@ -37,20 +36,24 @@ public class GameBindServiceImplTest {
     @Mock
     private GameDefinition gameDef;
     @Mock
-    private Player player;
+    private Player player, otherPlayer;
     @Mock
-    private GameBind insertGame, findGame_1, findGame_2, findGame_3;
+    private GameBind insertGame, findGame_1, findGame_2, findGame_3, joinGame;
 
     @Rule
     public ExpectedException thrown = ExpectedException.none();
 
     @Before
-    public void setUp() {
+    public void setUp() throws GameBindException {
+        when(gameBindRepository.findByGuid("join_guid")).thenReturn(joinGame);
+        when(joinGame.getPlayers()).thenReturn(Lists.newArrayList(player));
         when(insertGame.getType()).thenReturn(GameType.SAMPLE_GAME);
         when(gameDef.getType()).thenReturn(GameType.SAMPLE_GAME);
         when(findGame_1.getStatus()).thenReturn(GameBindStatus.OPEN);
         when(findGame_2.getStatus()).thenReturn(GameBindStatus.OPEN);
         when(findGame_3.getStatus()).thenReturn(GameBindStatus.OPEN);
+        when(player.getUsername()).thenReturn("player");
+        when(otherPlayer.getUsername()).thenReturn("other_player");
     }
 
     @Test
@@ -135,5 +138,72 @@ public class GameBindServiceImplTest {
 
         // when
         GameBind result = testObj.join("guid", player);
+    }
+
+    @Test
+    public void shouldNotUpdatePlayerStatusCausedByUnknownPlayer() throws GameBindException {
+
+        // given
+        when(joinGame.getPlayers()).thenReturn(Lists.newArrayList(otherPlayer));
+        thrown.expect(GameBindException.class);
+        thrown.expectMessage("You are not allowed to update this game");
+
+        // when
+        testObj.updatePlayerStatus("join_guid", "player");
+    }
+
+    @Test
+    public void shouldNotUpdatePlayerStatusCausedByBindIsNotReady() throws GameBindException {
+
+        // given
+        when(joinGame.getStatus()).thenReturn(GameBindStatus.OPEN);
+        when(joinGame.getGamePlayGuid()).thenReturn("play_guid");
+
+        // when
+        testObj.updatePlayerStatus("join_guid", "player");
+
+        // then
+        verify(player, never()).setStatus(PlayerStatus.NOTIFIED);
+    }
+
+    @Test
+    public void shouldNotUpdatePlayerStatusCausedByLackOfGamePlayGuid() throws GameBindException {
+
+        // given
+        when(joinGame.getStatus()).thenReturn(GameBindStatus.CLOSED);
+
+        // when
+        testObj.updatePlayerStatus("join_guid", "player");
+
+        // then
+        verify(player, never()).setStatus(PlayerStatus.NOTIFIED);
+    }
+
+    @Test
+    public void shouldUpdatePlayerStatusWCausedByCanceledStatus() throws GameBindException {
+
+        // given
+        when(joinGame.getStatus()).thenReturn(GameBindStatus.CANCELED);
+        when(joinGame.getGamePlayGuid()).thenReturn("play_guid");
+
+        // when
+        testObj.updatePlayerStatus("join_guid", "player");
+
+        // then
+        verify(player).setStatus(PlayerStatus.NOTIFIED);
+    }
+
+    @Test
+    public void shouldUpdatePlayerStatusWCausedByClosedStatus() throws GameBindException {
+
+        // given
+        when(joinGame.getStatus()).thenReturn(GameBindStatus.CLOSED);
+        when(joinGame.getGamePlayGuid()).thenReturn("play_guid");
+
+        // when
+        testObj.updatePlayerStatus("join_guid", "player");
+
+        // then
+        verify(player).setStatus(PlayerStatus.NOTIFIED);
     }
 }

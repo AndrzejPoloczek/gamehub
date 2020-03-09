@@ -1,6 +1,7 @@
 package gamehub.api.clients;
 
 import gamehub.api.config.FeignClientRequestConfiguration;
+import gamehub.sdk.dto.gamebind.GameBindCheckDTO;
 import gamehub.sdk.dto.gamebind.GameBindDTO;
 import gamehub.sdk.dto.gamebind.GameCreateDTO;
 import gamehub.sdk.dto.gamebind.GameJoinDTO;
@@ -25,4 +26,7 @@ public interface GameBindClient {
 
     @GetMapping(path = "/find/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<List<GameBindDTO>> findByType(@PathVariable String type);
+
+    @PutMapping(path = "/update/player/status/{guid}/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
+    ResponseEntity<GameBindCheckDTO> updatePlayerStatus(@PathVariable final String guid, @PathVariable final String username);
 }

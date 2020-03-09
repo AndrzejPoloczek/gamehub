@@ -4,6 +4,7 @@ import gamehub.gamebind.exception.GameBindException;
 import gamehub.gamebind.model.GameBind;
 import gamehub.gamebind.model.GameBindStatus;
 import gamehub.gamebind.model.Player;
+import gamehub.gamebind.model.PlayerStatus;
 import gamehub.gamebind.repository.GameBindRepository;
 import gamehub.sdk.enums.GameType;
 import org.springframework.stereotype.Repository;
@@ -72,6 +73,23 @@ public class GameBindRepositoryImpl implements GameBindRepository {
             newStatus.ifPresent(game::setStatus);
             gamePlayGuid.ifPresent(game::setGamePlayGuid);
         }
+    }
+
+    @Override
+    public Set<GameBind> findGamesToRemove() {
+        return games.values().stream()
+                .filter(this::shouldRemove)
+                .collect(Collectors.toSet());
+    }
+
+    @Override
+    public void remove(final GameBind gameBind) {
+        games.remove(gameBind.getGuid());
+    }
+
+    private boolean shouldRemove(final GameBind gameBind) {
+        return GameBindStatus.OPEN.equals(gameBind.getStatus()) && gameBind.getPlayers().stream()
+                        .allMatch(player -> PlayerStatus.NOTIFIED.equals(player.getStatus()));
     }
 
     private boolean canJoin(GameBind game) {

@@ -8,6 +8,7 @@ import gamehub.gamebind.model.*;
 import gamehub.gamebind.repository.GameBindRepository;
 import gamehub.gamebind.service.GameBindService;
 import gamehub.sdk.enums.GameType;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -49,6 +50,25 @@ public class GameBindServiceImpl implements GameBindService {
         final GameBind gameBind = gameBindRepository.join(guid, player);
         handleBindFilled(gameBind);
         return gameBind;
+    }
+
+    @Override
+    public GameBind updatePlayerStatus(String guid, String username) throws GameBindException {
+        final GameBind gameBind = gameBindRepository.findByGuid(guid);
+        final Player player = gameBind.getPlayers()
+                .stream()
+                .filter(current -> current.getUsername().equals(username))
+                .findFirst()
+                .orElseThrow(() -> new GameBindException(String.format("You are not allowed to update this game")));
+        if (shouldNotify(gameBind)) {
+            player.setStatus(PlayerStatus.NOTIFIED);
+        }
+        return gameBind;
+    }
+
+    private boolean shouldNotify(final GameBind gameBind) {
+        return (GameBindStatus.CLOSED.equals(gameBind.getStatus()) && StringUtils.isNotBlank(gameBind.getGamePlayGuid()))
+                || GameBindStatus.CANCELED.equals(gameBind.getStatus());
     }
 
     private void handleBindFilled(final GameBind gameBind) throws GameBindException {

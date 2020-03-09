@@ -4,6 +4,7 @@ public class Player {
 
     private String username;
     private String displayName;
+    private PlayerStatus status = PlayerStatus.WAITING;
 
     public String getUsername() {
         return username;
@@ -19,5 +20,13 @@ public class Player {
 
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
+    }
+
+    public PlayerStatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(PlayerStatus status) {
+        this.status = status;
     }
 }
