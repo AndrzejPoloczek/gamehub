@@ -4,6 +4,8 @@ import gamehub.sdk.dto.user.UserCreateDTO;
 import gamehub.sdk.dto.user.UserInfoDTO;
 import gamehub.sdk.dto.user.UserPasswordChangeDTO;
 import gamehub.sdk.dto.user.UserUpdateDTO;
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -20,16 +22,18 @@ import javax.validation.Valid;
 
 @RestController
 @RequestMapping(path = "/user")
+@Api(tags = "User management")
 public class UserManagementController extends AbstractController {
 
 	private UserManagerClient userManagerClient;
 
-
+	@ApiOperation(value = "Create a new user", response = UserInfoDTO.class)
 	@PostMapping(path = "/create", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<UserInfoDTO> create(@Valid @RequestBody UserCreateDTO user) {
 		return userManagerClient.create(user);
 	}
 
+	@ApiOperation(value = "Get user info", response = UserInfoDTO.class)
 	@GetMapping(path = "/get", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<UserInfoDTO> getByUsername() {
 		validateSessionUser();
@@ -37,12 +41,14 @@ public class UserManagementController extends AbstractController {
 
 	}
 
+	@ApiOperation(value = "Update user", response = UserInfoDTO.class)
 	@PostMapping(path = "/update", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<UserInfoDTO> update(@Valid @RequestBody UserUpdateDTO user) {
 		validateSessionUser();
 		return userManagerClient.update(getSessionUser().getUsername(), user);
 	}
 
+	@ApiOperation(value = "Change user's password")
 	@PostMapping(path = "/changePassword")
 	public ResponseEntity<Object> changePassword(@Valid @RequestBody UserPasswordChangeDTO password) {
 		validateSessionUser();
