@@ -88,7 +88,7 @@ public class GameBindRepositoryImpl implements GameBindRepository {
     }
 
     private boolean shouldRemove(final GameBind gameBind) {
-        return GameBindStatus.OPEN.equals(gameBind.getStatus()) && gameBind.getPlayers().stream()
+        return !GameBindStatus.OPEN.equals(gameBind.getStatus()) && gameBind.getPlayers().stream()
                         .allMatch(player -> PlayerStatus.NOTIFIED.equals(player.getStatus()));
     }
 
