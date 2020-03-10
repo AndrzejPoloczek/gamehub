@@ -9,6 +9,8 @@ import gamehub.gamebind.repository.GameBindRepository;
 import gamehub.gamebind.service.GameBindService;
 import gamehub.sdk.enums.GameType;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,6 +21,8 @@ import java.util.concurrent.Executors;
 
 @Service
 public class GameBindServiceImpl implements GameBindService {
+
+    private static final Logger LOG = LogManager.getLogger(GameBindServiceImpl.class);
 
     @Resource
     private AvailableGames availableGames;
@@ -59,7 +63,7 @@ public class GameBindServiceImpl implements GameBindService {
                 .stream()
                 .filter(current -> current.getUsername().equals(username))
                 .findFirst()
-                .orElseThrow(() -> new GameBindException(String.format("You are not allowed to update this game")));
+                .orElseThrow(() -> new GameBindException("You are not allowed to update this game"));
         if (shouldNotify(gameBind)) {
             player.setStatus(PlayerStatus.NOTIFIED);
         }
@@ -94,7 +98,7 @@ public class GameBindServiceImpl implements GameBindService {
                 gameBindRepository.update(guid, Optional.of(GameBindStatus.CANCELED), Optional.empty());
             }
         } catch (GameBindException e) {
-            e.printStackTrace();
+            LOG.error(String.format("Unable to update game play guid for game bind %s", guid), e);
         }
     }
 
