@@ -56,9 +56,19 @@ public class GameBindController extends AbstractController {
 
     @ApiOperation(value = "Check game status and update player status if necessary", response = GameBindCheckDTO.class)
     @PatchMapping(path = "/update/player/status/{guid}", produces = MediaType.APPLICATION_JSON_VALUE)
-    ResponseEntity<GameBindCheckDTO> updatePlayerStatus(@PathVariable final String guid) {
+    public ResponseEntity<GameBindCheckDTO> updatePlayerStatus(@PathVariable final String guid) {
         validateSessionUser();
         return gameBindClient.updatePlayerStatus(guid, getSessionUser().getUsername());
+    }
+
+    @GetMapping(path = "/games", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<List<GameDefinitionDTO>> getAvailableGames() {
+        return gameBindClient.getAvailableGames();
+    }
+
+    @GetMapping(path = "/games/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<GameDefinitionDTO> getGame(@PathVariable String type) {
+        return gameBindClient.getGame(type);
     }
 
     @Autowired

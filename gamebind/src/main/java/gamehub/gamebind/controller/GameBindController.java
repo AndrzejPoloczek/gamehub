@@ -7,12 +7,10 @@ import java.util.stream.Collectors;
 import javax.annotation.Resource;
 import javax.validation.Valid;
 
-import gamehub.gamebind.converter.CreateGameConverter;
-import gamehub.gamebind.converter.GameBindConverter;
-import gamehub.gamebind.converter.BindCheckConverter;
-import gamehub.gamebind.converter.PlayerConverter;
+import gamehub.gamebind.converter.*;
 import gamehub.gamebind.exception.GameBindException;
 import gamehub.gamebind.model.GameBind;
+import gamehub.gamebind.model.GameDefinition;
 import gamehub.gamebind.service.GameBindService;
 import gamehub.sdk.dto.gamebind.*;
 import gamehub.sdk.enums.GameType;
@@ -22,7 +20,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import gamehub.gamebind.config.AvailableGames;
-import gamehub.gamebind.model.GameDefinition;
 
 @RestController
 public class GameBindController {
@@ -35,18 +32,21 @@ public class GameBindController {
 	private CreateGameConverter createGameConverter;
 	private PlayerConverter playerConverter;
 	private BindCheckConverter bindCheckConverter;
+	private GameDefinitionConverter gameDefinitionConverter;
 
 	
 	@GetMapping(path = "/games", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<List<GameDefinition>> getAvailableGames() {
-		return ResponseEntity.ok().body(games.getGame());
+	public ResponseEntity<List<GameDefinitionDTO>> getAvailableGames() {
+		return ResponseEntity.ok().body(games.getGame().stream()
+				.map(gameDefinitionConverter::convert)
+				.collect(Collectors.toList()));
 	}
 	
 	@GetMapping(path = "/games/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
-	public ResponseEntity<GameDefinition> getGame(@PathVariable String type) {
+	public ResponseEntity<GameDefinitionDTO> getGame(@PathVariable String type) {
 		Optional<GameDefinition> game = games.getGameByType(GameType.valueOf(type));
 		if (game.isPresent()) {
-			return ResponseEntity.ok().body(game.get());
+			return ResponseEntity.ok().body(gameDefinitionConverter.convert(game.get()));
 		}
 		return ResponseEntity.notFound().build();
 	}
@@ -109,5 +109,10 @@ public class GameBindController {
 	@Autowired
 	public void setBindCheckConverter(BindCheckConverter bindCheckConverter) {
 		this.bindCheckConverter = bindCheckConverter;
+	}
+
+	@Autowired
+	public void setGameDefinitionConverter(GameDefinitionConverter gameDefinitionConverter) {
+		this.gameDefinitionConverter = gameDefinitionConverter;
 	}
 }
