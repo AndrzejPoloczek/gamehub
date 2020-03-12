@@ -11,6 +11,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
     private static final String[] AUTH_WHITELIST = {
             "/user/create",
+            "/game/bind/games/**",
             // -- swagger ui
             "/swagger-resources/**",
             "/swagger-ui.html",
