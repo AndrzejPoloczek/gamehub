@@ -1,0 +1,6 @@
+/target/
+/.classpath
+/.project
+/.settings
+/.idea
+/ox3-game-service.iml
