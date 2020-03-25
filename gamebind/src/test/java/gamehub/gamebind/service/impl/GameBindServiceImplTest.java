@@ -61,7 +61,7 @@ public class GameBindServiceImplTest {
 
         // given
         thrown.expect(GameBindException.class);
-        thrown.expectMessage("Game type 'SAMPLE_GAME' not found.");
+        thrown.expectMessage("Game type 'OX3' not found.");
 
         // when
         testObj.create(insertGame);
