@@ -25,7 +25,7 @@ public class GameDefinitionConverterTest {
     public void shouldPopulate() {
 
         // given
-        when(source.getType()).thenReturn(GameType.SAMPLE_GAME);
+        when(source.getType()).thenReturn(GameType.OX3);
         when(source.getName()).thenReturn("_name");
         when(source.getDescription()).thenReturn("_description");
         when(source.getMinPlayers()).thenReturn(2);
@@ -36,7 +36,7 @@ public class GameDefinitionConverterTest {
 
         // then
         assertThat(target).isNotNull();
-        assertThat(target.getType()).isEqualTo(GameType.SAMPLE_GAME);
+        assertThat(target.getType()).isEqualTo(GameType.OX3);
         assertThat(target.getName()).isEqualTo("_name");
         assertThat(target.getDescription()).isEqualTo("_description");
         assertThat(target.getMinPlayers()).isEqualTo(2);

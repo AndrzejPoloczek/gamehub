@@ -85,7 +85,7 @@ public class GameBindServiceImpl implements GameBindService {
     private Optional<String> findPlayGuid(final GameBind gameBind) {
         try {
             return Optional.of(gamePlayGuidRetryable.getGuid(gameBind));
-        } catch (GamePlayGuidException e) {
+        } catch (GamePlayGuidException | GameBindException e) {
             return Optional.empty();
         }
     }

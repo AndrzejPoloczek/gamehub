@@ -47,8 +47,8 @@ public class GameBindServiceImplTest {
     public void setUp() throws GameBindException {
         when(gameBindRepository.findByGuid("join_guid")).thenReturn(joinGame);
         when(joinGame.getPlayers()).thenReturn(Lists.newArrayList(player));
-        when(insertGame.getType()).thenReturn(GameType.SAMPLE_GAME);
-        when(gameDef.getType()).thenReturn(GameType.SAMPLE_GAME);
+        when(insertGame.getType()).thenReturn(GameType.OX3);
+        when(gameDef.getType()).thenReturn(GameType.OX3);
         when(findGame_1.getStatus()).thenReturn(GameBindStatus.OPEN);
         when(findGame_2.getStatus()).thenReturn(GameBindStatus.OPEN);
         when(findGame_3.getStatus()).thenReturn(GameBindStatus.OPEN);
@@ -71,7 +71,7 @@ public class GameBindServiceImplTest {
     public void shouldCreate() throws GameBindException {
 
         // given
-        when(availableGames.getGameByType(GameType.SAMPLE_GAME)).thenReturn(Optional.of(gameDef));
+        when(availableGames.getGameByType(GameType.OX3)).thenReturn(Optional.of(gameDef));
         when(gameBindRepository.insert(any())).thenReturn(insertGame);
 
         // when
@@ -103,10 +103,10 @@ public class GameBindServiceImplTest {
     public void shouldFindProperGamesByType() {
 
         // given
-        when(gameBindRepository.findAvailable(GameType.SAMPLE_GAME)).thenReturn(Lists.newArrayList(findGame_3));
+        when(gameBindRepository.findAvailable(GameType.OX3)).thenReturn(Lists.newArrayList(findGame_3));
 
         // when
-        List<GameBind> games = testObj.getAvailableGames(GameType.SAMPLE_GAME);
+        List<GameBind> games = testObj.getAvailableGames(GameType.OX3);
 
         // then
         Assertions.assertThat(games).isNotNull();

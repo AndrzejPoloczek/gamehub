@@ -1,10 +1,12 @@
 package gamehub.gamebind.component;
 
 import com.netflix.hystrix.exception.HystrixBadRequestException;
-import gamehub.gamebind.clients.GamePlayClient;
+import gamehub.gamebind.clients.GameClient;
+import gamehub.gamebind.exception.GameBindException;
 import gamehub.gamebind.exception.GamePlayGuidException;
 import gamehub.gamebind.model.GameBind;
 import gamehub.gamebind.converter.PlayerReverseConverter;
+import gamehub.gamebind.service.GamePlayService;
 import gamehub.sdk.dto.gameplay.GameCreateDTO;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -25,7 +27,7 @@ public class GamePlayGuidRetryable {
 
     private static final Logger LOG = LogManager.getLogger(GamePlayGuidRetryable.class);
 
-    private GamePlayClient gamePlayClient;
+    private GamePlayService gamePlayService;
     private PlayerReverseConverter playerReverseConverter;
 
     @Retryable(
@@ -33,8 +35,10 @@ public class GamePlayGuidRetryable {
             maxAttempts = 10,
             backoff = @Backoff(10000)
     )
-    public String getGuid(final GameBind gameBind) throws GamePlayGuidException {
-        ResponseEntity<String> guid = gamePlayClient.create(prepareCreateDTO(gameBind));
+    public String getGuid(final GameBind gameBind) throws GamePlayGuidException, GameBindException {
+        GameClient gameClient = gamePlayService.getClient(gameBind.getType())
+                .orElseThrow(() -> new GameBindException("No game client found fot type " + gameBind.getType()));
+        ResponseEntity<String> guid = gameClient.create(prepareCreateDTO(gameBind));
         if (guid.getStatusCode().equals(HttpStatus.OK)) {
             return guid.getBody();
         }
@@ -44,7 +48,6 @@ public class GamePlayGuidRetryable {
 
     private GameCreateDTO prepareCreateDTO(final GameBind gameBind) {
         final GameCreateDTO createDTO = new GameCreateDTO();
-        createDTO.setGameType(gameBind.getType());
         createDTO.setPlayers(gameBind.getPlayers().stream()
                 .map(playerReverseConverter::convert)
                 .collect(Collectors.toList()));
@@ -52,8 +55,8 @@ public class GamePlayGuidRetryable {
     }
 
     @Autowired
-    public void setGamePlayClient(GamePlayClient gamePlayClient) {
-        this.gamePlayClient = gamePlayClient;
+    public void setGamePlayService(GamePlayService gamePlayService) {
+        this.gamePlayService = gamePlayService;
     }
 
     @Autowired
