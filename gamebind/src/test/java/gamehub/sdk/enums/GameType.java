@@ -1,5 +1,5 @@
 package gamehub.sdk.enums;
 
 public enum GameType {
-	OX3
+    OX3, INVALID_TYPE
 }

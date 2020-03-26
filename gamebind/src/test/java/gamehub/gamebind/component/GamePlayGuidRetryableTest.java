@@ -1,10 +1,13 @@
 package gamehub.gamebind.component;
 
 import com.netflix.hystrix.exception.HystrixBadRequestException;
-import gamehub.gamebind.clients.GamePlayClient;
+import gamehub.gamebind.clients.OX3GameClient;
+import gamehub.gamebind.exception.GameBindException;
 import gamehub.gamebind.exception.GamePlayGuidException;
 import gamehub.gamebind.model.GameBind;
 import gamehub.gamebind.converter.PlayerReverseConverter;
+import gamehub.gamebind.service.GamePlayService;
+import gamehub.sdk.enums.GameType;
 import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
@@ -14,6 +17,8 @@ import org.mockito.Mock;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+import java.util.Optional;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
@@ -25,9 +30,11 @@ public class GamePlayGuidRetryableTest {
     private GamePlayGuidRetryable testObj;
 
     @Mock
-    private GamePlayClient gamePlayClient;
+    private OX3GameClient gamePlayClient;
     @Mock
     private PlayerReverseConverter playerReversePopulator;
+    @Mock
+    private GamePlayService gamePlayService;
 
     @Mock
     private GameBind gameBind;
@@ -40,10 +47,12 @@ public class GamePlayGuidRetryableTest {
         when(ok.getStatusCode()).thenReturn(HttpStatus.OK);
         when(ok.getBody()).thenReturn("GUID");
         when(failed.getStatusCode()).thenReturn(HttpStatus.BAD_REQUEST);
+        when(gamePlayService.getClient(GameType.OX3)).thenReturn(Optional.of(gamePlayClient));
+        when(gameBind.getType()).thenReturn(GameType.OX3);
     }
 
     @Test
-    public void shouldGetGuid() throws GamePlayGuidException {
+    public void shouldGetGuid() throws GamePlayGuidException, GameBindException {
 
         // given
         when(gamePlayClient.create(any())).thenReturn(ok);
@@ -57,7 +66,7 @@ public class GamePlayGuidRetryableTest {
     }
 
     @Test(expected = GamePlayGuidException.class)
-    public void shouldNotGetGuidCauseOfGamePlayGuidException() throws GamePlayGuidException {
+    public void shouldNotGetGuidCauseOfGamePlayGuidException() throws GamePlayGuidException, GameBindException {
 
         // given
         when(gamePlayClient.create(any())).thenReturn(failed);
@@ -67,7 +76,7 @@ public class GamePlayGuidRetryableTest {
     }
 
     @Test(expected = HystrixBadRequestException.class)
-    public void shouldNotGetGuidCauseOfHystrixBadRequestException() throws GamePlayGuidException {
+    public void shouldNotGetGuidCauseOfHystrixBadRequestException() throws GamePlayGuidException, GameBindException {
 
         // given
         when(gamePlayClient.create(any())).thenThrow(new HystrixBadRequestException("failed"));

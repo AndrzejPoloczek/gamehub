@@ -32,7 +32,7 @@ public class GameBindConverterTest {
         when(owner.getDisplayName()).thenReturn("_owner");
         when(player.getDisplayName()).thenReturn("_player");
         when(source.getGuid()).thenReturn("_guid");
-        when(source.getType()).thenReturn(GameType.SAMPLE_GAME);
+        when(source.getType()).thenReturn(GameType.OX3);
         when(source.getOwner()).thenReturn(owner);
         when(source.getPlayers()).thenReturn(Lists.newArrayList(owner, player));
 
@@ -43,7 +43,7 @@ public class GameBindConverterTest {
         // then
         assertThat(bindDTO).isNotNull();
         assertThat(bindDTO.getGuid()).isEqualTo("_guid");
-        assertThat(bindDTO.getType()).isEqualTo("SAMPLE_GAME");
+        assertThat(bindDTO.getType()).isEqualTo("OX3");
         assertThat(bindDTO.getOwner()).isEqualTo("_owner");
         assertThat(bindDTO.getPlayers()).containsExactly("_owner","_player");
     }

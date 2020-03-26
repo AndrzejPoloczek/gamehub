@@ -34,7 +34,7 @@ public class CreateGameConverterTest {
 
         // given
         when(playerConverter.convert(source)).thenReturn(player);
-        when(source.getType()).thenReturn("SAMPLE_GAME");
+        when(source.getType()).thenReturn("OX3");
         when(source.getUsername()).thenReturn("_username");
         when(source.getDisplayName()).thenReturn("_displayName");
         when(source.getPlayers()).thenReturn(3);
@@ -49,7 +49,7 @@ public class CreateGameConverterTest {
         assertThat(gameBind.getPlayers()).containsOnly(player);
         assertThat(gameBind.getStatus()).isEqualTo(GameBindStatus.OPEN);
         assertThat(gameBind.getOwner()).isEqualTo(player);
-        assertThat(gameBind.getType()).isEqualTo(GameType.SAMPLE_GAME);
+        assertThat(gameBind.getType()).isEqualTo(GameType.OX3);
         assertThat(gameBind.getGamePlayGuid()).isBlank();
     }
 }
