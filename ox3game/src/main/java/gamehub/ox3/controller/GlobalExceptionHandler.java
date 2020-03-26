@@ -1,6 +1,7 @@
 package gamehub.ox3.controller;
 
 import gamehub.ox3.exception.GamePlayException;
+import gamehub.ox3.exception.GameStateException;
 import gamehub.sdk.error.ApiError;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -13,7 +14,12 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(GamePlayException.class)
-    public ResponseEntity<ApiError> handleGameBindException(GamePlayException ex) {
+    public ResponseEntity<ApiError> handleGamePlayException(GamePlayException ex) {
+        return ResponseEntity.badRequest().body(ApiError.buildFromException(HttpStatus.BAD_REQUEST, ex));
+    }
+
+    @ExceptionHandler(GameStateException.class)
+    public ResponseEntity<ApiError> handleGameStateException(GameStateException ex) {
         return ResponseEntity.badRequest().body(ApiError.buildFromException(HttpStatus.BAD_REQUEST, ex));
     }
 
