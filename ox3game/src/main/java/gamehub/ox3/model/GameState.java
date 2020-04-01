@@ -8,7 +8,8 @@ public class GameState {
     private Map<String, String> players;
     private Map<String, Figure> figures;
     private Figure current;
-    private OX3State state;
+    private Map<String, OX3State> states;
+    private Figure[][] area = new Figure[3][3];
 
     public String getGuid() {
         return guid;
@@ -42,11 +43,19 @@ public class GameState {
         this.current = current;
     }
 
-    public OX3State getState() {
-        return state;
+    public Map<String, OX3State> getStates() {
+        return states;
     }
 
-    public void setState(OX3State state) {
-        this.state = state;
+    public void setStates(Map<String, OX3State> states) {
+        this.states = states;
+    }
+
+    public Figure[][] getArea() {
+        return area;
+    }
+
+    public void setArea(Figure[][] area) {
+        this.area = area;
     }
 }

@@ -5,7 +5,9 @@ import gamehub.ox3.model.Figure;
 import gamehub.ox3.model.GameState;
 import gamehub.ox3.model.OX3State;
 import gamehub.ox3.repository.GameStateRepository;
+import gamehub.ox3.service.GameInitService;
 import gamehub.ox3.service.GameStateService;
+import gamehub.ox3.validation.GameStateValidation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,24 +18,19 @@ import java.util.stream.Collectors;
 public class GameStateServiceImpl implements GameStateService {
 
     private GameStateRepository gameStateRepository;
+    private GameInitService gameInitService;
+    private GameStateValidation gameStateValidation;
 
     @Override
     public GameState create(Map<String, String> players) throws GameStateException {
         validatePlayers(players);
         final GameState state = new GameState();
+        final List<String> usernames = players.keySet().stream().collect(Collectors.toList());
         state.setPlayers(players);
-        state.setFigures(getInitialFigures(players));
+        state.setFigures(gameInitService.getInitialFigures(usernames));
         state.setCurrent(Figure.O);
-        state.setState(OX3State.WAITING);
+        state.setStates(gameInitService.getInitialStates(usernames));
         return gameStateRepository.create(state);
-    }
-
-    private Map<String, Figure> getInitialFigures(Map<String, String> players) {
-        final Map<String, Figure> figures = new HashMap<>();
-        final List<String> keys = players.keySet().stream().collect(Collectors.toList());
-        figures.put(keys.get(0), Figure.O);
-        figures.put(keys.get(1), Figure.X);
-        return figures;
     }
 
     private void validatePlayers(Map<String, String> players) throws GameStateException {
@@ -42,8 +39,49 @@ public class GameStateServiceImpl implements GameStateService {
         }
     }
 
+    @Override
+    public GameState get(String guid, String username) throws GameStateException {
+        final GameState state = gameStateRepository.findById(guid);
+        gameStateValidation.validateUsername(state, username);
+        return state;
+    }
+
+    @Override
+    public GameState confirmReady(final String guid, final String username) throws GameStateException {
+        final GameState state = gameStateRepository.findById(guid);
+        gameStateValidation.validateReadyActionsAllowed(state, username);
+        state.getStates().remove(username);
+        state.getStates().put(username, OX3State.PLAY);
+        if (isReady(state)) {
+            state.setArea(gameInitService.createArea());
+        }
+        return gameStateRepository.update(state);
+    }
+
+    @Override
+    public boolean isReady(String guid, String username) throws GameStateException {
+        final GameState state = gameStateRepository.findById(guid);
+        gameStateValidation.validateUsername(state, username);
+        return isReady(state);
+    }
+
+    @Override
+    public boolean isReady(GameState state) {
+        return !state.getStates().values().contains(OX3State.WAITING);
+    }
+
     @Autowired
     public void setGameStateRepository(GameStateRepository gameStateRepository) {
         this.gameStateRepository = gameStateRepository;
+    }
+
+    @Autowired
+    public void setGameInitService(GameInitService gameInitService) {
+        this.gameInitService = gameInitService;
+    }
+
+    @Autowired
+    public void setGameStateValidation(GameStateValidation gameStateValidation) {
+        this.gameStateValidation = gameStateValidation;
     }
 }
