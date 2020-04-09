@@ -45,7 +45,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                     .successHandler(ghAuthenticationSuccessHandler)
                 .and()
                     .logout()
-                    .logoutSuccessHandler(ghLogoutSuccessHandler);
+                    .logoutSuccessHandler(ghLogoutSuccessHandler)
+                .and()
+                    .cors();
     }
 
     @Autowired
