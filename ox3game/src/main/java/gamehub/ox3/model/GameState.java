@@ -10,6 +10,8 @@ public class GameState {
     private Figure current;
     private Map<String, OX3State> states;
     private Figure[][] area = new Figure[3][3];
+    private String winnerCoordinates;
+    private Figure winnerFigure;
 
     public String getGuid() {
         return guid;
@@ -57,5 +59,21 @@ public class GameState {
 
     public void setArea(Figure[][] area) {
         this.area = area;
+    }
+
+    public String getWinnerCoordinates() {
+        return winnerCoordinates;
+    }
+
+    public void setWinnerCoordinates(String winnerCoordinates) {
+        this.winnerCoordinates = winnerCoordinates;
+    }
+
+    public Figure getWinnerFigure() {
+        return winnerFigure;
+    }
+
+    public void setWinnerFigure(Figure winnerFigure) {
+        this.winnerFigure = winnerFigure;
     }
 }

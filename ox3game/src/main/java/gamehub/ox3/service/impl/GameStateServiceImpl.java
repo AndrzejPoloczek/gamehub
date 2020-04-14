@@ -30,6 +30,7 @@ public class GameStateServiceImpl implements GameStateService {
         state.setFigures(gameInitService.getInitialFigures(usernames));
         state.setCurrent(Figure.O);
         state.setStates(gameInitService.getInitialStates(usernames));
+        state.setWinnerFigure(Figure.EMPTY);
         return gameStateRepository.create(state);
     }
 
@@ -54,6 +55,8 @@ public class GameStateServiceImpl implements GameStateService {
         state.getStates().put(username, OX3State.PLAY);
         if (isReady(state)) {
             state.setArea(gameInitService.createArea());
+            state.setWinnerCoordinates(null);
+            state.setWinnerFigure(Figure.EMPTY);
         }
         return gameStateRepository.update(state);
     }
