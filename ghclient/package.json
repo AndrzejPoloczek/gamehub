@@ -1,0 +1,24 @@
+{
+  "name": "GHClient",
+  "version": "1.0.0",
+  "description": "GameHub client application",
+  "author": "",
+  "private": true,
+  "scripts": {
+    "dev": "nuxt",
+    "build": "nuxt build",
+    "start": "nuxt start",
+    "generate": "nuxt generate",
+    "build:framevuerk": "framevuerk-builder -c ./framevuerk-config.js",
+    "prepublish": "npm run build:framevuerk"
+  },
+  "dependencies": {
+    "axios": "^0.19.2",
+    "framevuerk": "^2.2.5",
+    "nuxt": "^2.0.0"
+  },
+  "devDependencies": {
+    "@nuxt/typescript-build": "^0.6.0",
+    "framevuerk-builder": "^2.0.2"
+  }
+}
