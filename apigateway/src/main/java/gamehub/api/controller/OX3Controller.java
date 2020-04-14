@@ -1,6 +1,7 @@
 package gamehub.api.controller;
 
 import gamehub.api.clients.OX3Client;
+import gamehub.api.dto.ApiPlayDTO;
 import gamehub.api.dto.ApiReadyDTO;
 import io.swagger.annotations.Api;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,6 +26,18 @@ public class OX3Controller extends AbstractController {
     public ResponseEntity<ApiReadyDTO> readyCheck(@PathVariable final String guid) {
         validateSessionUser();
         return ox3Client.readyCheck(guid, getSessionUser().getUsername());
+    }
+
+    @PutMapping(path = "/play/move/{guid}/{x}/{y}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ApiPlayDTO> playMove(@PathVariable final String guid, @PathVariable final int x, @PathVariable final int y){
+        validateSessionUser();
+        return ox3Client.playMove(guid, getSessionUser().getUsername(), x, y);
+    }
+
+    @GetMapping(path = "/play/check/{guid}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ApiPlayDTO> playCheck(@PathVariable final String guid) {
+        validateSessionUser();
+        return ox3Client.playCheck(guid, getSessionUser().getUsername());
     }
 
     @Autowired
