@@ -4,7 +4,7 @@
       You are not logged in
     </span>
     <span v-if="authorized">
-      Loffed as {{displayName}} ({{username}})
+      Logged as {{displayName}} ({{username}})
     </span>
   </div>
 </template>
@@ -24,15 +24,23 @@
           }
         },
         async created() {
-          const config = {
+          const api = axios.create({
+            baseURL: 'http://localhost:8080',
+            withCredentials: true,
             headers: {
-              'Accept': "application/json"
+              'Accept': 'application/json',
+              'Content-Type': 'application/json',
+            },
+            params: {
             }
-          }
+          });
 
           try {
-            const res = await axios.get('http://localhost:8080/user/get', config);
-            console.log("Found: %o", res);
+            const res = await api.get('/user/get');
+            console.log("Found: %o", res.data);
+            this.authorized = true;
+            this.username = res.data.username;
+            this.displayName = res.data.displayName;
           } catch (e) {
             console.log("Error: %o", e.response.data);
             this.authorized = false;

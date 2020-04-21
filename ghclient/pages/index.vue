@@ -33,11 +33,9 @@
         <div class="fv-margin-end">
           <FramevuerkLogo />
         </div>
-        <div class="fv-grow">
-          <h2 class="fv-hidden-xs">
-            Framevuerk
-          </h2>
-          <small class="fv-hidden-sm fv-hidden-xs"> Generated Nuxt + Framevuerk Template </small>
+          <small class="fv-hidden-sm fv-hidden-xs">
+            <CurrentUserComponent />
+          </small>
         </div>
         <fvButton class="fv-margin-end" @click.prevent="toggleDocsMenu">
           <i class="material-icons">list</i>
@@ -69,7 +67,6 @@
         <div class="fv-margin-bottom fv-hidden-xs fv-hidden-sm" />
         <div class="content__header fv-margin-bottom fv-padding">
           <div class="fv-padding fv-margin-bottom fv-text-center">
-            <UseCreateComponent />
             <Logo />
           </div>
           <p>
@@ -137,17 +134,19 @@
 <script>
 import Logo from '~/components/Logo.vue'
 import FramevuerkLogo from '~/components/FramevuerkLogo.vue'
-import UseCreateComponent from "../components/UserLoginComponent";
+import UseCreateComponent from "../components/UseCreateComponent";
+import CurrentUserComponent from "../components/CurrentUserComponent";
 
 export default {
   components: {
+    CurrentUserComponent,
     UseCreateComponent,
     Logo,
     FramevuerkLogo
   },
   data () {
     return {
-      sidebar: false,
+      sidebar: true,
       docsMenu: false,
       slider: 'One',
       exmps: {
