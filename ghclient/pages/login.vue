@@ -1,22 +1,23 @@
 <template>
-  <fvMain>
-    <div class="content fv-padding">
-
+  <fv-content>
+    <fv-header>
       <CurrentUserComponent />
-      <LoginComponent />
-
-      <div class="fv-padding fv-text-center fv-margin-top fv-margin-bottom">
-       ------ OR ------
+    </fv-header>
+    <fvMain>
+      <div class="content fv-padding">
+        <LoginComponent />
+        <div class="fv-padding fv-text-center fv-margin-top fv-margin-bottom">
+          ------ OR ------
+        </div>
+        <UseCreateComponent />
       </div>
-
-      <UseCreateComponent />
-    </div>
-  </fvMain>
+    </fvMain>
+  </fv-content>
 
 </template>
 
 <script>
-    import UseCreateComponent from "../components/UserLoginComponent";
+    import UseCreateComponent from "../components/UseCreateComponent";
     import LoginComponent from "../components/LoginComponent";
     import CurrentUserComponent from "../components/CurrentUserComponent";
     export default {
