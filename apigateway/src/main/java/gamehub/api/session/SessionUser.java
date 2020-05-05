@@ -11,6 +11,7 @@ public class SessionUser {
     private static final long serialVersionUID = 1L;
     private String username;
     private String displayName;
+    private String currentBind;
 
 
     public String getUsername() {
@@ -27,5 +28,13 @@ public class SessionUser {
 
     public void setDisplayName(String displayName) {
         this.displayName = displayName;
+    }
+
+    public String getCurrentBind() {
+        return currentBind;
+    }
+
+    public void setCurrentBind(String currentBind) {
+        this.currentBind = currentBind;
     }
 }
