@@ -1,6 +1,7 @@
 package gamehub.api.controller;
 
 import gamehub.api.clients.GameBindClient;
+import gamehub.api.dto.ApiCurrentGameDTO;
 import gamehub.api.dto.ApiGameCreateDTO;
 import gamehub.sdk.dto.gamebind.*;
 import io.swagger.annotations.Api;
@@ -23,21 +24,31 @@ public class GameBindController extends AbstractController {
     @PostMapping(path = "/create", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<GameBindDTO> create(@RequestBody ApiGameCreateDTO form) {
         validateSessionUser();
+        validateCurrentBind();
+
         GameCreateDTO create = new GameCreateDTO();
         create.setType(form.getType());
         create.setPlayers(form.getPlayers());
         populateSessionPlayer(create);
-        return gameBindClient.create(create);
+
+        final ResponseEntity<GameBindDTO> bind = gameBindClient.create(create);
+        getSessionUser().setCurrentBind(bind.getBody().getGuid());
+        return bind;
     }
 
     @ApiOperation(value = "Create existing game", response = GameBindDTO.class)
     @PutMapping(path = "/join/{guid}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<GameBindDTO> join(@PathVariable String guid) {
         validateSessionUser();
+        validateCurrentBind();
+
         GameJoinDTO join = new GameJoinDTO();
         join.setGuid(guid);
         populateSessionPlayer(join);
-        return gameBindClient.join(join);
+
+        final ResponseEntity<GameBindDTO> bind = gameBindClient.join(join);
+        getSessionUser().setCurrentBind(bind.getBody().getGuid());
+        return bind;
     }
 
     @ApiOperation(value = "Create available games", response = List.class)
@@ -69,6 +80,12 @@ public class GameBindController extends AbstractController {
     @GetMapping(path = "/games/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<GameDefinitionDTO> getGame(@PathVariable String type) {
         return gameBindClient.getGame(type);
+    }
+
+    @GetMapping(path = "/current", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<ApiCurrentGameDTO> getCurrentBind() {
+        validateSessionUser();
+        return ResponseEntity.ok(new ApiCurrentGameDTO(getSessionUser().getCurrentBind()));
     }
 
     @Autowired

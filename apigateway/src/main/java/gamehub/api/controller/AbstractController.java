@@ -16,6 +16,12 @@ public class AbstractController {
         }
     }
 
+    protected void validateCurrentBind() {
+        if (StringUtils.isNotBlank(sessionUser.getCurrentBind())) {
+            throw new IllegalStateException("You already bind other game.");
+        }
+    }
+
     protected SessionUser getSessionUser() {
         return sessionUser;
     }
