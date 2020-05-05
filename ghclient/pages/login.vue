@@ -1,28 +1,20 @@
 <template>
-  <fv-content>
-    <fv-header>
-      <CurrentUserComponent />
-    </fv-header>
-    <fvMain>
-      <div class="content fv-padding">
-        <LoginComponent />
-        <div class="fv-padding fv-text-center fv-margin-top fv-margin-bottom">
-          ------ OR ------
-        </div>
-        <UseCreateComponent />
-      </div>
-    </fvMain>
-  </fv-content>
-
+  <div class="content fv-padding">
+    <LoginComponent />
+    <div class="fv-padding fv-text-center fv-margin-top fv-margin-bottom">
+      ------ OR ------
+    </div>
+    <UseCreateComponent />
+  </div>
 </template>
 
 <script>
     import UseCreateComponent from "../components/UseCreateComponent";
     import LoginComponent from "../components/LoginComponent";
-    import CurrentUserComponent from "../components/CurrentUserComponent";
+    import SiteHeaderComponent from "../components/SiteHeaderComponent";
     export default {
-        name: "LoginPage",
-      components: {CurrentUserComponent, LoginComponent, UseCreateComponent}
+      name: "LoginPage",
+      components: {SiteHeaderComponent, LoginComponent, UseCreateComponent}
     }
 </script>
 

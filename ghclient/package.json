@@ -15,7 +15,8 @@
   "dependencies": {
     "axios": "^0.19.2",
     "framevuerk": "^2.2.5",
-    "nuxt": "^2.0.0"
+    "nuxt": "^2.0.0",
+    "vuex": "^3.2.0"
   },
   "devDependencies": {
     "@nuxt/typescript-build": "^0.6.0",

@@ -50,8 +50,7 @@
               this.errorMassage = '';
               this.loginSuccess = true;
               this.successMessage = 'You are logged in!';
-              alert ('GO');
-              this.$router.go('/index');
+              this.$router.push('/');
             } catch (e) {
               this.hasError = true;
               this.errorMassage = "Login failed, tray again.";

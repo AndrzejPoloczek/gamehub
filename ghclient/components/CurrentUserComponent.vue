@@ -1,10 +1,10 @@
 <template>
-  <div>
+  <div class="current-user-component">
     <span v-if="!authorized">
-      You are not logged in
+      -
     </span>
     <span v-if="authorized">
-      Logged as {{displayName}} ({{username}})
+      Hello {{getDisplayName}}
     </span>
   </div>
 </template>
@@ -16,12 +16,22 @@
         name: "CurrentUserComponent",
         data() {
           return {
-            username: '',
-            displayName: '',
-            bindingGuid: '',
-            playingGuid: '',
             authorized: false
           }
+        },
+        computed: {
+            getUsername: function() {
+              return this.$store.state.username;
+            },
+            getDisplayName: function() {
+              return this.$store.state.displayName;
+            },
+            getGameBind: function() {
+              return this.$store.state.gameBind;
+            },
+            getGamePlay: function() {
+              return this.$store.state.gamePlay;
+            }
         },
         async created() {
           const api = axios.create({
@@ -31,19 +41,18 @@
               'Accept': 'application/json',
               'Content-Type': 'application/json',
             },
-            params: {
-            }
+            params: {}
           });
-
           try {
             const res = await api.get('/user/get');
-            console.log("Found: %o", res.data);
             this.authorized = true;
-            this.username = res.data.username;
-            this.displayName = res.data.displayName;
+            this.$store.commit('setUsername', res.data.username);
+            this.$store.commit('setDisplayName', res.data.displayName);
           } catch (e) {
-            console.log("Error: %o", e.response.data);
             this.authorized = false;
+            this.$store.commit('setUsername', undefined);
+            this.$store.commit('setDisplayName', undefined);
+            this.$router.push('/login');
           }
         }
     }
