@@ -67,7 +67,7 @@
               console.log("Created account: %o", res);
             } catch (e) {
               this.hasError = true;
-              this.errorMassage = "Error while creating user";
+              this.errorMassage = e.response.data.message;
               this.showForm = true;
               this.successMessage = '';
               if (e.response.data !== undefined && e.response.data.errors !== undefined) {

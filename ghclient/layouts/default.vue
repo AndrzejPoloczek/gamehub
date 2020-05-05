@@ -1,5 +1,11 @@
 <template>
-  <nuxt />
+  <fv-content>
+    <site-header-component />
+    <fvMain>
+      <nuxt />
+    </fvMain>
+    <site-footer-component />
+  </fv-content>
 </template>
 
 <style>
@@ -32,3 +38,10 @@ body .material-icons {
   vertical-align: middle;
 }
 </style>
+<script>
+  import SiteHeaderComponent from "../components/SiteHeaderComponent";
+  import SiteFooterComponent from "../components/SiteFooterComponent";
+  export default {
+    components: {SiteFooterComponent, SiteHeaderComponent}
+  }
+</script>
