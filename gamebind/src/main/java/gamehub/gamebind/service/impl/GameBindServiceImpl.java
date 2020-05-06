@@ -3,10 +3,14 @@ package gamehub.gamebind.service.impl;
 import gamehub.gamebind.component.GamePlayGuidRetryable;
 import gamehub.gamebind.config.AvailableGames;
 import gamehub.gamebind.exception.GameBindException;
+import gamehub.gamebind.exception.GameCancelException;
 import gamehub.gamebind.exception.GamePlayGuidException;
 import gamehub.gamebind.model.*;
 import gamehub.gamebind.repository.GameBindRepository;
 import gamehub.gamebind.service.GameBindService;
+import gamehub.gamebind.strategy.CancelJoinerStrategy;
+import gamehub.gamebind.strategy.CancelOwnerStrategy;
+import gamehub.gamebind.strategy.CancelStrategy;
 import gamehub.sdk.enums.GameType;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.logging.log4j.LogManager;
@@ -29,12 +33,13 @@ public class GameBindServiceImpl implements GameBindService {
 
     private GameBindRepository gameBindRepository;
     private GamePlayGuidRetryable gamePlayGuidRetryable;
-
+    private CancelOwnerStrategy cancelOwnerStrategy;
+    private CancelJoinerStrategy cancelJoinerStrategy;
 
     @Override
-    public GameBind create(final GameBind gameBind) throws GameBindException {
-        validateGameType(gameBind.getType());
-        final GameBind created = gameBindRepository.insert(gameBind);
+    public GameBind create(final GameBind bind) throws GameBindException {
+        validateGameBind(bind);
+        final GameBind created = gameBindRepository.insert(bind);
         handleBindFilled(created);
         return created;
     }
@@ -51,40 +56,51 @@ public class GameBindServiceImpl implements GameBindService {
 
     @Override
     public GameBind join(String guid, Player player) throws GameBindException {
-        final GameBind gameBind = gameBindRepository.join(guid, player);
-        handleBindFilled(gameBind);
-        return gameBind;
+        final GameBind bind = gameBindRepository.join(guid, player);
+        handleBindFilled(bind);
+        return bind;
     }
 
     @Override
     public GameBind updatePlayerStatus(String guid, String username) throws GameBindException {
-        final GameBind gameBind = gameBindRepository.findByGuid(guid);
-        final Player player = gameBind.getPlayers()
+        final GameBind bind = gameBindRepository.findByGuid(guid);
+        final Player player = bind.getPlayers()
                 .stream()
                 .filter(current -> current.getUsername().equals(username))
                 .findFirst()
                 .orElseThrow(() -> new GameBindException("You are not allowed to update this game"));
-        if (shouldNotify(gameBind)) {
+        if (shouldNotify(bind)) {
             player.setStatus(PlayerStatus.NOTIFIED);
         }
-        return gameBind;
+        return bind;
     }
 
-    private boolean shouldNotify(final GameBind gameBind) {
-        return (GameBindStatus.CLOSED.equals(gameBind.getStatus()) && StringUtils.isNotBlank(gameBind.getGamePlayGuid()))
-                || GameBindStatus.CANCELED.equals(gameBind.getStatus());
+    @Override
+    public void cancel(String guid, String username) throws GameBindException, GameCancelException {
+        final GameBind bind = gameBindRepository.findByGuid(guid);
+        if (!GameBindStatus.OPEN.equals(bind.getStatus())) {
+            throw new GameCancelException("Unable to cancel closed or canceled game bind");
+        }
+        final CancelStrategy cancelStrategy = bind.getOwner().getUsername().equals(username)
+                ? cancelOwnerStrategy : cancelJoinerStrategy;
+        cancelStrategy.cancel(bind, username);
     }
 
-    private void handleBindFilled(final GameBind gameBind) throws GameBindException {
-        if (gameBind.getExpectedPlayers() == gameBind.getPlayers().size()) {
-            gameBindRepository.update(gameBind.getGuid(), Optional.of(GameBindStatus.CLOSED), Optional.empty());
-            Executors.newSingleThreadExecutor().execute(() -> updateGamePlayGuid(gameBind.getGuid(), findPlayGuid(gameBind)));
+    private boolean shouldNotify(final GameBind bind) {
+        return (GameBindStatus.CLOSED.equals(bind.getStatus()) && StringUtils.isNotBlank(bind.getGamePlayGuid()))
+                || GameBindStatus.CANCELED.equals(bind.getStatus());
+    }
+
+    private void handleBindFilled(final GameBind bind) throws GameBindException {
+        if (bind.getExpectedPlayers() == bind.getPlayers().size()) {
+            gameBindRepository.update(bind.getGuid(), Optional.of(GameBindStatus.CLOSED), Optional.empty());
+            Executors.newSingleThreadExecutor().execute(() -> updateGamePlayGuid(bind.getGuid(), findPlayGuid(bind)));
         }
     }
 
-    private Optional<String> findPlayGuid(final GameBind gameBind) {
+    private Optional<String> findPlayGuid(final GameBind bind) {
         try {
-            return Optional.of(gamePlayGuidRetryable.getGuid(gameBind));
+            return Optional.of(gamePlayGuidRetryable.getGuid(bind));
         } catch (GamePlayGuidException | GameBindException e) {
             return Optional.empty();
         }
@@ -102,9 +118,15 @@ public class GameBindServiceImpl implements GameBindService {
         }
     }
 
-    private void validateGameType(GameType type) throws GameBindException {
-        if (!availableGames.getGameByType(type).isPresent()) {
-            throw new GameBindException(String.format("Game type '%s' not found.", type));
+    private void validateGameBind(final GameBind bind) throws GameBindException {
+        final Optional<GameDefinition> gameOpt = availableGames.getGameByType(bind.getType());
+        if (!gameOpt.isPresent()) {
+            throw new GameBindException(String.format("Game type '%s' not found.", bind.getType()));
+        }
+        GameDefinition game = gameOpt.get();
+        if (game.getMinPlayers() > bind.getExpectedPlayers() || game.getMaxPlayers() < bind.getExpectedPlayers()) {
+            throw new GameBindException(String.format("Player count bust be between %s and %s",
+                    game.getMinPlayers(), game.getMaxPlayers()));
         }
     }
 
@@ -117,5 +139,15 @@ public class GameBindServiceImpl implements GameBindService {
     @Autowired
     public void setGamePlayGuidRetryable(GamePlayGuidRetryable gamePlayGuidRetryable) {
         this.gamePlayGuidRetryable = gamePlayGuidRetryable;
+    }
+
+    @Autowired
+    public void setCancelOwnerStrategy(CancelOwnerStrategy cancelOwnerStrategy) {
+        this.cancelOwnerStrategy = cancelOwnerStrategy;
+    }
+
+    @Autowired
+    public void setCancelJoinerStrategy(CancelJoinerStrategy cancelJoinerStrategy) {
+        this.cancelJoinerStrategy = cancelJoinerStrategy;
     }
 }

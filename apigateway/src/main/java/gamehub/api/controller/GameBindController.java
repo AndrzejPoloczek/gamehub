@@ -24,7 +24,7 @@ public class GameBindController extends AbstractController {
     @PostMapping(path = "/create", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<GameBindDTO> create(@RequestBody ApiGameCreateDTO form) {
         validateSessionUser();
-        validateCurrentBind();
+        validateCurrentBindEmpty();
 
         GameCreateDTO create = new GameCreateDTO();
         create.setType(form.getType());
@@ -40,7 +40,7 @@ public class GameBindController extends AbstractController {
     @PutMapping(path = "/join/{guid}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<GameBindDTO> join(@PathVariable String guid) {
         validateSessionUser();
-        validateCurrentBind();
+        validateCurrentBindEmpty();
 
         GameJoinDTO join = new GameJoinDTO();
         join.setGuid(guid);
@@ -69,7 +69,11 @@ public class GameBindController extends AbstractController {
     @PatchMapping(path = "/update/player/status/{guid}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<GameBindCheckDTO> updatePlayerStatus(@PathVariable final String guid) {
         validateSessionUser();
-        return gameBindClient.updatePlayerStatus(guid, getSessionUser().getUsername());
+        ResponseEntity<GameBindCheckDTO> check = gameBindClient.updatePlayerStatus(guid, getSessionUser().getUsername());
+        if (check.getBody().isCanceled()) {
+            getSessionUser().setCurrentBind(null);
+        }
+        return check;
     }
 
     @GetMapping(path = "/games", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -86,6 +90,15 @@ public class GameBindController extends AbstractController {
     public ResponseEntity<ApiCurrentGameDTO> getCurrentBind() {
         validateSessionUser();
         return ResponseEntity.ok(new ApiCurrentGameDTO(getSessionUser().getCurrentBind()));
+    }
+
+    @GetMapping(path = "/cancel/{guid}", produces = MediaType.APPLICATION_JSON_VALUE)
+    public ResponseEntity<Object> cancelBind(@PathVariable final String guid) {
+        validateSessionUser();
+        validateCurrentBind();
+        ResponseEntity<Object> result = gameBindClient.cancelBind(guid, getSessionUser().getUsername());
+        getSessionUser().setCurrentBind(null);
+        return result;
     }
 
     @Autowired

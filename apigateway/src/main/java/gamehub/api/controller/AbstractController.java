@@ -16,9 +16,15 @@ public class AbstractController {
         }
     }
 
-    protected void validateCurrentBind() {
+    protected void validateCurrentBindEmpty() {
         if (StringUtils.isNotBlank(sessionUser.getCurrentBind())) {
             throw new IllegalStateException("You already bind other game.");
+        }
+    }
+
+    protected void validateCurrentBind() {
+        if (StringUtils.isBlank(sessionUser.getCurrentBind())) {
+            throw new IllegalStateException("You have no game to cancel");
         }
     }
 
