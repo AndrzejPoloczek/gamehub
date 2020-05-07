@@ -1,6 +1,7 @@
 package gamehub.gamebind.controller;
 
 import gamehub.gamebind.exception.GameBindException;
+import gamehub.gamebind.exception.GameCancelException;
 import gamehub.sdk.error.ApiError;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -14,6 +15,11 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(GameBindException.class)
     public ResponseEntity<ApiError> handleGameBindException(GameBindException ex) {
+        return ResponseEntity.badRequest().body(ApiError.buildFromException(HttpStatus.BAD_REQUEST, ex));
+    }
+
+    @ExceptionHandler(GameCancelException.class)
+    public ResponseEntity<ApiError> handleGameCancelException(GameCancelException ex) {
         return ResponseEntity.badRequest().body(ApiError.buildFromException(HttpStatus.BAD_REQUEST, ex));
     }
 

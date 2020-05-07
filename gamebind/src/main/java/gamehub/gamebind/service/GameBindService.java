@@ -1,6 +1,7 @@
 package gamehub.gamebind.service;
 
 import gamehub.gamebind.exception.GameBindException;
+import gamehub.gamebind.exception.GameCancelException;
 import gamehub.gamebind.model.GameBind;
 import gamehub.gamebind.model.Player;
 import gamehub.sdk.enums.GameType;
@@ -11,11 +12,11 @@ public interface GameBindService {
 
     /**
      * Create a new game bind
-     * @param gameBind Game bind object to create
+     * @param bind Game bind object to create
      * @return
      * @throws GameBindException
      */
-    GameBind create(GameBind gameBind) throws GameBindException;
+    GameBind create(GameBind bind) throws GameBindException;
 
     /**
      * Get all available games
@@ -44,4 +45,13 @@ public interface GameBindService {
      * @return
      */
     GameBind updatePlayerStatus(String guid, String username) throws GameBindException;
+
+    /**
+     * Cancel game by user
+     * @param guid
+     * @param username
+     * @return
+     * @throws GameBindException
+     */
+    void cancel(String guid, String username) throws GameBindException, GameCancelException;
 }

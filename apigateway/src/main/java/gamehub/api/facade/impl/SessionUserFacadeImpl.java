@@ -1,28 +1,25 @@
-package gamehub.api.controller;
+package gamehub.api.facade.impl;
 
+import gamehub.api.facade.SessionUserFacade;
 import gamehub.api.session.SessionUser;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Component;
 
-@RestController
-public class AbstractController {
+@Component
+public class SessionUserFacadeImpl implements SessionUserFacade {
 
     private SessionUser sessionUser;
 
-    protected void validateSessionUser() {
+    @Override
+    public void validateSessionUser() {
         if (StringUtils.isBlank(sessionUser.getUsername()) || StringUtils.isBlank(sessionUser.getDisplayName())) {
             throw new IllegalStateException("Session user is no valid, You need to login again.");
         }
     }
 
-    protected void validateCurrentBind() {
-        if (StringUtils.isNotBlank(sessionUser.getCurrentBind())) {
-            throw new IllegalStateException("You already bind other game.");
-        }
-    }
-
-    protected SessionUser getSessionUser() {
+    @Override
+    public SessionUser getSessionUser() {
         return sessionUser;
     }
 

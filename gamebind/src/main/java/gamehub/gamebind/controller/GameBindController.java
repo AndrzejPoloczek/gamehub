@@ -9,6 +9,7 @@ import javax.validation.Valid;
 
 import gamehub.gamebind.converter.*;
 import gamehub.gamebind.exception.GameBindException;
+import gamehub.gamebind.exception.GameCancelException;
 import gamehub.gamebind.model.GameBind;
 import gamehub.gamebind.model.GameDefinition;
 import gamehub.gamebind.service.GameBindService;
@@ -85,6 +86,11 @@ public class GameBindController {
 		return ResponseEntity.ok().body(bindCheckConverter.convert(gameBind));
 	}
 
+	@PutMapping(path = "/cancel/{guid}/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
+	public ResponseEntity<Object> cancelBind(@PathVariable final String guid, @PathVariable final String username) throws GameBindException, GameCancelException {
+		gameBindService.cancel(guid, username);
+		return ResponseEntity.ok(true);
+	}
 
 	@Autowired
 	public void setGameBindService(GameBindService gameBindService) {

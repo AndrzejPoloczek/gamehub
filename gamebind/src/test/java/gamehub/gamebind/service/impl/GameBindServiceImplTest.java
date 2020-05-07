@@ -3,8 +3,11 @@ package gamehub.gamebind.service.impl;
 import com.google.common.collect.Lists;
 import gamehub.gamebind.config.AvailableGames;
 import gamehub.gamebind.exception.GameBindException;
+import gamehub.gamebind.exception.GameCancelException;
 import gamehub.gamebind.model.*;
 import gamehub.gamebind.repository.GameBindRepository;
+import gamehub.gamebind.strategy.CancelJoinerStrategy;
+import gamehub.gamebind.strategy.CancelOwnerStrategy;
 import gamehub.sdk.enums.GameType;
 import org.assertj.core.api.Assertions;
 import org.junit.Before;
@@ -32,6 +35,10 @@ public class GameBindServiceImplTest {
     private AvailableGames availableGames;
     @Mock
     private GameBindRepository gameBindRepository;
+    @Mock
+    private CancelOwnerStrategy cancelOwnerStrategy;
+    @Mock
+    private CancelJoinerStrategy cancelJoinerStrategy;
 
     @Mock
     private GameDefinition gameDef;
@@ -68,11 +75,44 @@ public class GameBindServiceImplTest {
     }
 
     @Test
+    public void shouldNotCreateCausedByNoMinEcpectedPlayers() throws GameBindException {
+
+        // given
+        when(availableGames.getGameByType(GameType.OX3)).thenReturn(Optional.of(gameDef));
+        when(gameDef.getMinPlayers()).thenReturn(2);
+        when(gameDef.getMaxPlayers()).thenReturn(4);
+        when(insertGame.getExpectedPlayers()).thenReturn(1);
+        thrown.expect(GameBindException.class);
+        thrown.expectMessage("Player count bust be between 2 and 4");
+
+        // when
+        testObj.create(insertGame);
+    }
+
+    @Test
+    public void shouldNotCreateCausedByNoMaxEcpectedPlayers() throws GameBindException {
+
+        // given
+        when(availableGames.getGameByType(GameType.OX3)).thenReturn(Optional.of(gameDef));
+        when(gameDef.getMinPlayers()).thenReturn(2);
+        when(gameDef.getMaxPlayers()).thenReturn(4);
+        when(insertGame.getExpectedPlayers()).thenReturn(5);
+        thrown.expect(GameBindException.class);
+        thrown.expectMessage("Player count bust be between 2 and 4");
+
+        // when
+        testObj.create(insertGame);
+    }
+
+    @Test
     public void shouldCreate() throws GameBindException {
 
         // given
         when(availableGames.getGameByType(GameType.OX3)).thenReturn(Optional.of(gameDef));
         when(gameBindRepository.insert(any())).thenReturn(insertGame);
+        when(gameDef.getMinPlayers()).thenReturn(2);
+        when(gameDef.getMaxPlayers()).thenReturn(4);
+        when(insertGame.getExpectedPlayers()).thenReturn(4);
 
         // when
         GameBind game = testObj.create(insertGame);
@@ -205,5 +245,57 @@ public class GameBindServiceImplTest {
 
         // then
         verify(player).setStatus(PlayerStatus.NOTIFIED);
+    }
+
+    @Test
+    public void shouldNotCancelCausedByClosedStatus() throws GameBindException, GameCancelException {
+
+        // given
+        when(joinGame.getStatus()).thenReturn(GameBindStatus.CLOSED);
+        thrown.expect(GameCancelException.class);
+        thrown.expectMessage("Unable to cancel closed or canceled game bind");
+
+        // when
+        testObj.cancel("join_guid", "user");
+    }
+
+    @Test
+    public void shouldNotCancelCausedByCancelStatus() throws GameBindException, GameCancelException {
+
+        // given
+        when(joinGame.getStatus()).thenReturn(GameBindStatus.CANCELED);
+        thrown.expect(GameCancelException.class);
+        thrown.expectMessage("Unable to cancel closed or canceled game bind");
+
+        // when
+        testObj.cancel("join_guid", "user");
+    }
+
+    @Test
+    public void shouldCancelByOwner() throws GameBindException, GameCancelException {
+
+        // given
+        when(joinGame.getStatus()).thenReturn(GameBindStatus.OPEN);
+        when(joinGame.getOwner()).thenReturn(player);
+
+        // when
+        testObj.cancel("join_guid", "player");
+
+        // then
+        verify(cancelOwnerStrategy).cancel(joinGame, "player");
+    }
+
+    @Test
+    public void shouldCancelByJoiner() throws GameCancelException, GameBindException {
+
+        // given
+        when(joinGame.getStatus()).thenReturn(GameBindStatus.OPEN);
+        when(joinGame.getOwner()).thenReturn(player);
+
+        // when
+        testObj.cancel("join_guid", "other_player");
+
+        // then
+        verify(cancelJoinerStrategy).cancel(joinGame, "other_player");
     }
 }

@@ -1,5 +1,6 @@
 package gamehub.api.controller;
 
+import gamehub.api.facade.SessionUserFacade;
 import gamehub.sdk.dto.user.UserCreateDTO;
 import gamehub.sdk.dto.user.UserInfoDTO;
 import gamehub.sdk.dto.user.UserPasswordChangeDTO;
@@ -23,9 +24,10 @@ import javax.validation.Valid;
 @RestController
 @RequestMapping(path = "/user")
 @Api(tags = "User management")
-public class UserManagementController extends AbstractController {
+public class UserManagementController {
 
 	private UserManagerClient userManagerClient;
+	private SessionUserFacade sessionUserFacade;
 
 	@ApiOperation(value = "Create a new user", response = UserInfoDTO.class)
 	@PostMapping(path = "/create", produces = MediaType.APPLICATION_JSON_VALUE)
@@ -36,27 +38,32 @@ public class UserManagementController extends AbstractController {
 	@ApiOperation(value = "Get user info", response = UserInfoDTO.class)
 	@GetMapping(path = "/get", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<UserInfoDTO> getByUsername() {
-		validateSessionUser();
-		return userManagerClient.getByUsername(getSessionUser().getUsername());
+		sessionUserFacade.validateSessionUser();
+		return userManagerClient.getByUsername(sessionUserFacade.getSessionUser().getUsername());
 
 	}
 
 	@ApiOperation(value = "Update user", response = UserInfoDTO.class)
 	@PostMapping(path = "/update", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<UserInfoDTO> update(@Valid @RequestBody UserUpdateDTO user) {
-		validateSessionUser();
-		return userManagerClient.update(getSessionUser().getUsername(), user);
+		sessionUserFacade.validateSessionUser();
+		return userManagerClient.update(sessionUserFacade.getSessionUser().getUsername(), user);
 	}
 
 	@ApiOperation(value = "Change user's password")
 	@PostMapping(path = "/changePassword")
 	public ResponseEntity<Object> changePassword(@Valid @RequestBody UserPasswordChangeDTO password) {
-		validateSessionUser();
-		return userManagerClient.changePassword(getSessionUser().getUsername(), password);
+		sessionUserFacade.validateSessionUser();
+		return userManagerClient.changePassword(sessionUserFacade.getSessionUser().getUsername(), password);
 	}
 
 	@Autowired
 	public void setUserManagerClient(UserManagerClient userManagerClient) {
 		this.userManagerClient = userManagerClient;
+	}
+
+	@Autowired
+	public void setSessionUserFacade(SessionUserFacade sessionUserFacade) {
+		this.sessionUserFacade = sessionUserFacade;
 	}
 }
