@@ -86,7 +86,7 @@ public class GameBindController {
 		return ResponseEntity.ok().body(bindCheckConverter.convert(gameBind));
 	}
 
-	@GetMapping(path = "/cancel/{guid}/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
+	@PutMapping(path = "/cancel/{guid}/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
 	public ResponseEntity<Object> cancelBind(@PathVariable final String guid, @PathVariable final String username) throws GameBindException, GameCancelException {
 		gameBindService.cancel(guid, username);
 		return ResponseEntity.ok(true);

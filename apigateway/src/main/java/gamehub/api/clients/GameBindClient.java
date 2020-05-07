@@ -33,6 +33,6 @@ public interface GameBindClient {
     @GetMapping(path = "/games/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<GameDefinitionDTO> getGame(@PathVariable String type);
 
-    @GetMapping(path = "/cancel/{guid}/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @PutMapping(path = "/cancel/{guid}/{username}", produces = MediaType.APPLICATION_JSON_VALUE)
     ResponseEntity<Object> cancelBind(@PathVariable final String guid, @PathVariable final String username);
 }

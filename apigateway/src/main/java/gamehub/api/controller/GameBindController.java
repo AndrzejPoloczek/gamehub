@@ -3,6 +3,7 @@ package gamehub.api.controller;
 import gamehub.api.clients.GameBindClient;
 import gamehub.api.dto.ApiCurrentGameDTO;
 import gamehub.api.dto.ApiGameCreateDTO;
+import gamehub.api.facade.GameBindFacade;
 import gamehub.sdk.dto.gamebind.*;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -16,98 +17,73 @@ import java.util.List;
 @RestController
 @RequestMapping(path = "/game/bind")
 @Api(tags = "Game bind process")
-public class GameBindController extends AbstractController {
+public class GameBindController {
 
+    private GameBindFacade gameBindFacade;
     private GameBindClient gameBindClient;
 
     @ApiOperation(value = "Create a new game", response = GameBindDTO.class)
     @PostMapping(path = "/create", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<GameBindDTO> create(@RequestBody ApiGameCreateDTO form) {
-        validateSessionUser();
-        validateCurrentBindEmpty();
-
-        GameCreateDTO create = new GameCreateDTO();
-        create.setType(form.getType());
-        create.setPlayers(form.getPlayers());
-        populateSessionPlayer(create);
-
-        final ResponseEntity<GameBindDTO> bind = gameBindClient.create(create);
-        getSessionUser().setCurrentBind(bind.getBody().getGuid());
-        return bind;
+        return gameBindFacade.create(form);
     }
 
     @ApiOperation(value = "Create existing game", response = GameBindDTO.class)
     @PutMapping(path = "/join/{guid}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<GameBindDTO> join(@PathVariable String guid) {
-        validateSessionUser();
-        validateCurrentBindEmpty();
-
-        GameJoinDTO join = new GameJoinDTO();
-        join.setGuid(guid);
-        populateSessionPlayer(join);
-
-        final ResponseEntity<GameBindDTO> bind = gameBindClient.join(join);
-        getSessionUser().setCurrentBind(bind.getBody().getGuid());
-        return bind;
+        return gameBindFacade.join(guid);
     }
 
     @ApiOperation(value = "Create available games", response = List.class)
     @GetMapping(path = "/find", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<GameBindDTO>> find() {
-        validateSessionUser();
-        return gameBindClient.find();
+        return gameBindFacade.find();
     }
 
     @ApiOperation(value = "Create available games by type", response = List.class)
     @GetMapping(path = "/find/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<GameBindDTO>> findByType(@PathVariable String type) {
-        validateSessionUser();
-        return gameBindClient.findByType(type);
+        return gameBindFacade.findByType(type);
     }
 
     @ApiOperation(value = "Check game status and update player status if necessary", response = GameBindCheckDTO.class)
     @PatchMapping(path = "/update/player/status/{guid}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<GameBindCheckDTO> updatePlayerStatus(@PathVariable final String guid) {
-        validateSessionUser();
-        ResponseEntity<GameBindCheckDTO> check = gameBindClient.updatePlayerStatus(guid, getSessionUser().getUsername());
-        if (check.getBody().isCanceled()) {
-            getSessionUser().setCurrentBind(null);
-        }
-        return check;
+        return gameBindFacade.updatePlayerStatus(guid);
     }
 
+    @ApiOperation(value = "Get available game definitions", response = GameDefinitionDTO.class)
     @GetMapping(path = "/games", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<List<GameDefinitionDTO>> getAvailableGames() {
         return gameBindClient.getAvailableGames();
     }
 
+    @ApiOperation(value = "Get available game definition by type", response = GameDefinitionDTO.class)
     @GetMapping(path = "/games/{type}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<GameDefinitionDTO> getGame(@PathVariable String type) {
         return gameBindClient.getGame(type);
     }
 
+    @ApiOperation(value = "Get current game bind guid, if exists", response = ApiCurrentGameDTO.class)
     @GetMapping(path = "/current", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<ApiCurrentGameDTO> getCurrentBind() {
-        validateSessionUser();
-        return ResponseEntity.ok(new ApiCurrentGameDTO(getSessionUser().getCurrentBind()));
+        return gameBindFacade.getCurrentBind();
     }
 
-    @GetMapping(path = "/cancel/{guid}", produces = MediaType.APPLICATION_JSON_VALUE)
+    @ApiOperation(value = "Cancel current bind game", response = Boolean.class)
+    @PutMapping(path = "/cancel/{guid}", produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<Object> cancelBind(@PathVariable final String guid) {
-        validateSessionUser();
-        validateCurrentBind();
-        ResponseEntity<Object> result = gameBindClient.cancelBind(guid, getSessionUser().getUsername());
-        getSessionUser().setCurrentBind(null);
-        return result;
+        return gameBindFacade.cancelBind(guid);
+    }
+
+
+    @Autowired
+    public void setGameBindFacade(GameBindFacade gameBindFacade) {
+        this.gameBindFacade = gameBindFacade;
     }
 
     @Autowired
     public void setGameBindClient(GameBindClient gameBindClient) {
         this.gameBindClient = gameBindClient;
-    }
-
-    private void populateSessionPlayer(PlayerDTO playerDTO) {
-        playerDTO.setUsername(getSessionUser().getUsername());
-        playerDTO.setDisplayName(getSessionUser().getDisplayName());
     }
 }
