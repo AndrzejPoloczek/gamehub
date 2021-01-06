@@ -13,7 +13,7 @@
     "prepublish": "npm run build:framevuerk"
   },
   "dependencies": {
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "framevuerk": "^2.2.5",
     "nuxt": "^2.0.0",
     "vuex": "^3.2.0"
